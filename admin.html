@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — Iloilo Travel Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg:         #0d0a1a;
+      --bg2:        #13102a;
+      --bg3:        #1a1535;
+      --surface:    #1e1938;
+      --surface2:   #251f42;
+      --border:     rgba(138,90,255,0.18);
+      --border2:    rgba(138,90,255,0.38);
+      --primary:    #8a5aff;
+      --primary-d:  #6b3fe0;
+      --primary-l:  #b088ff;
+      --accent:     #c961ff;
+      --accent2:    #ff6bcd;
+      --cyan:       #5de4ff;
+      --green:      #4ade80;
+      --yellow:     #fbbf24;
+      --red:        #f87171;
+      --text:       #f0ecff;
+      --text-soft:  #c8bef5;
+      --text-muted: #8a7ab8;
+      --glow-sm:    0 0 14px rgba(138,90,255,0.28);
+      --glow-md:    0 0 28px rgba(138,90,255,0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background:
+        radial-gradient(ellipse 50% 40% at 10% 10%, rgba(138,90,255,0.1) 0%, transparent 60%),
+        radial-gradient(ellipse 35% 30% at 90% 90%, rgba(201,97,255,0.07) 0%, transparent 60%);
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(138,90,255,0.35); border-radius: 10px; }
+
+    /* ============================================================
+       LOGIN SCREEN
+    ============================================================ */
+    #login-screen {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 200;
+      background: var(--bg);
+    }
+
+    .login-card {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 28px;
+      padding: 48px 40px;
+      text-align: center;
+      max-width: 380px; width: 90%;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.5), var(--glow-md);
+      animation: fadeUp 0.5s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative; z-index: 1;
+    }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(30px) scale(0.95); }
+      to   { opacity:1; transform: none; }
+    }
+
+    .login-badge {
+      width: 80px; height: 80px; border-radius: 24px;
+      background: linear-gradient(135deg, var(--primary-d), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 38px; margin: 0 auto 22px;
+      box-shadow: 0 8px 32px rgba(138,90,255,0.45);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .login-card h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 22px; font-weight: 700;
+      background: linear-gradient(135deg, var(--text), var(--primary-l));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 6px;
+    }
+
+    .login-card p {
+      color: var(--text-muted); font-size: 13px;
+      margin-bottom: 28px; line-height: 1.6;
+    }
+
+    .google-login-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 14px 20px;
+      border-radius: 14px; border: 1px solid var(--border2);
+      background: rgba(138,90,255,0.12);
+      color: var(--text); cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 14px; font-weight: 600;
+      transition: all 0.22s;
+    }
+    .google-login-btn:hover {
+      background: rgba(138,90,255,0.22);
+      box-shadow: var(--glow-sm); transform: translateY(-1px);
+    }
+
+    #login-error {
+      margin-top: 14px; font-size: 12px;
+      color: var(--red); display: none;
+      padding: 8px 12px; border-radius: 8px;
+      background: rgba(248,113,113,0.1);
+      border: 1px solid rgba(248,113,113,0.25);
+    }
+
+    /* ============================================================
+       MAIN DASHBOARD
+    ============================================================ */
+    #dashboard { display: none; position: relative; z-index: 1; }
+
+    /* TOPBAR */
+    .dash-topbar {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 50;
+    }
+
+    .dash-topbar-left {
+      display: flex; align-items: center; gap: 12px;
+    }
+
+    .dash-logo {
+      width: 38px; height: 38px; border-radius: 11px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 3px 12px rgba(138,90,255,0.4);
+    }
+
+    .dash-title h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px; font-weight: 700;
+      background: linear-gradient(135deg, var(--text), var(--primary-l));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .dash-title p { font-size: 11px; color: var(--text-muted); }
+
+    .dash-topbar-right { display: flex; align-items: center; gap: 10px; }
+
+    .refresh-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(138,90,255,0.08);
+      color: var(--text-soft); cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px; font-weight: 600;
+      transition: all 0.2s;
+    }
+    .refresh-btn:hover { background: rgba(138,90,255,0.18); color: var(--text); border-color: var(--border2); }
+    .refresh-btn.spinning .refresh-icon { animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .refresh-icon { display: inline-block; }
+
+    .admin-info {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 12px; border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(138,90,255,0.08);
+      font-size: 12px; color: var(--text-soft);
+    }
+
+    .admin-avatar {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #fff;
+    }
+
+    .signout-btn {
+      padding: 7px 14px; border-radius: 10px;
+      border: 1px solid rgba(248,113,113,0.25);
+      background: rgba(248,113,113,0.08);
+      color: var(--red); cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px; font-weight: 600;
+      transition: all 0.2s;
+    }
+    .signout-btn:hover { background: rgba(248,113,113,0.16); }
+
+    /* NAV TABS */
+    .dash-nav {
+      display: flex; align-items: center; gap: 4px;
+      padding: 12px 28px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .nav-tab {
+      display: flex; align-items: center; gap: 7px;
+      padding: 9px 16px; border-radius: 10px;
+      border: 1px solid transparent;
+      background: transparent; cursor: pointer;
+      color: var(--text-muted);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px; font-weight: 500;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .nav-tab:hover { background: rgba(138,90,255,0.1); color: var(--text-soft); }
+    .nav-tab.active {
+      background: rgba(138,90,255,0.18);
+      border-color: var(--border2);
+      color: var(--primary-l);
+      box-shadow: var(--glow-sm);
+    }
+
+    /* CONTENT AREA */
+    .dash-content { padding: 28px; max-width: 1400px; margin: 0 auto; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+
+    /* ============================================================
+       STAT CARDS
+    ============================================================ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px; margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 18px; padding: 22px 20px;
+      position: relative; overflow: hidden;
+      transition: all 0.25s;
+    }
+    .stat-card:hover { border-color: var(--border2); box-shadow: var(--glow-sm); transform: translateY(-2px); }
+
+    .stat-card::before {
+      content: '';
+      position: absolute; top: 0; right: 0;
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      opacity: 0.08;
+    }
+    .stat-card.purple::before { background: var(--primary); }
+    .stat-card.pink::before   { background: var(--accent2); }
+    .stat-card.cyan::before   { background: var(--cyan); }
+    .stat-card.green::before  { background: var(--green); }
+    .stat-card.yellow::before { background: var(--yellow); }
+
+    .stat-icon {
+      width: 44px; height: 44px; border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; margin-bottom: 14px;
+    }
+    .stat-card.purple .stat-icon { background: rgba(138,90,255,0.18); }
+    .stat-card.pink   .stat-icon { background: rgba(255,107,205,0.18); }
+    .stat-card.cyan   .stat-icon { background: rgba(93,228,255,0.18); }
+    .stat-card.green  .stat-icon { background: rgba(74,222,128,0.18); }
+    .stat-card.yellow .stat-icon { background: rgba(251,191,36,0.18); }
+
+    .stat-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 30px; font-weight: 700;
+      color: var(--text); line-height: 1;
+      margin-bottom: 5px;
+    }
+    .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    .stat-sub { font-size: 11px; color: var(--text-muted); margin-top: 8px; opacity: 0.7; }
+
+    /* LOADING SKELETON */
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer { to { background-position: -200% 0; } }
+
+    /* ============================================================
+       SECTION HEADERS
+    ============================================================ */
+    .section-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 700;
+      color: var(--text);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .section-badge {
+      padding: 2px 8px; border-radius: 20px;
+      background: rgba(138,90,255,0.18);
+      border: 1px solid var(--border);
+      font-size: 11px; color: var(--primary-l);
+      font-weight: 600;
+    }
+
+    /* ============================================================
+       TABLE
+    ============================================================ */
+    .data-table-wrap {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 18px; overflow: hidden;
+    }
+
+    .data-table {
+      width: 100%; border-collapse: collapse;
+    }
+
+    .data-table thead tr {
+      background: rgba(138,90,255,0.08);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table th {
+      padding: 12px 16px; text-align: left;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-muted);
+    }
+
+    .data-table td {
+      padding: 13px 16px; font-size: 13px;
+      color: var(--text-soft);
+      border-bottom: 1px solid rgba(138,90,255,0.06);
+    }
+
+    .data-table tbody tr:hover { background: rgba(138,90,255,0.05); }
+    .data-table tbody tr:last-child td { border-bottom: none; }
+
+    .td-main { color: var(--text) !important; font-weight: 500; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    /* BADGE */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px; border-radius: 20px;
+      font-size: 11px; font-weight: 600;
+    }
+    .badge.green  { background: rgba(74,222,128,0.12);  color: var(--green);  border: 1px solid rgba(74,222,128,0.25); }
+    .badge.red    { background: rgba(248,113,113,0.12); color: var(--red);    border: 1px solid rgba(248,113,113,0.25); }
+    .badge.purple { background: rgba(138,90,255,0.12);  color: var(--primary-l); border: 1px solid var(--border); }
+    .badge.yellow { background: rgba(251,191,36,0.12);  color: var(--yellow); border: 1px solid rgba(251,191,36,0.25); }
+
+    /* ============================================================
+       CHAT VIEWER
+    ============================================================ */
+    .chat-viewer-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 18px;
+      min-height: 500px;
+    }
+
+    .session-list {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 18px; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+
+    .session-list-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      color: var(--text-muted);
+    }
+
+    .session-items { overflow-y: auto; flex: 1; }
+
+    .session-item {
+      padding: 13px 16px;
+      border-bottom: 1px solid rgba(138,90,255,0.06);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .session-item:hover { background: rgba(138,90,255,0.08); }
+    .session-item.active { background: rgba(138,90,255,0.14); border-left: 3px solid var(--primary); }
+
+    .session-item-user {
+      font-size: 13px; font-weight: 600;
+      color: var(--text); margin-bottom: 4px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .session-item-preview {
+      font-size: 11px; color: var(--text-muted);
+      white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .session-item-time {
+      font-size: 10px; color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* CHAT MESSAGES PANEL */
+    .chat-panel {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 18px; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+
+    .chat-panel-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-panel-title {
+      font-size: 13px; font-weight: 600; color: var(--text);
+    }
+
+    .chat-panel-sub { font-size: 11px; color: var(--text-muted); }
+
+    .chat-messages-view {
+      flex: 1; overflow-y: auto;
+      padding: 20px; display: flex;
+      flex-direction: column; gap: 14px;
+      min-height: 400px;
+    }
+
+    .admin-msg-row {
+      display: flex; gap: 9px; max-width: 80%;
+    }
+    .admin-msg-row.user-row { align-self: flex-end; flex-direction: row-reverse; }
+    .admin-msg-row.bot-row  { align-self: flex-start; }
+
+    .admin-msg-av {
+      width: 30px; height: 30px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0; align-self: flex-end;
+    }
+    .admin-msg-av.bot-av { background: linear-gradient(135deg, var(--primary-d), var(--accent)); }
+    .admin-msg-av.user-av { background: linear-gradient(135deg, #6b3fe0, var(--accent2)); }
+
+    .admin-bubble {
+      padding: 10px 14px; border-radius: 14px;
+      font-size: 13px; line-height: 1.6;
+    }
+    .admin-bubble.bot-b {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); border-bottom-left-radius: 4px;
+    }
+    .admin-bubble.user-b {
+      background: linear-gradient(135deg, var(--primary), var(--primary-d));
+      color: #fff; border-bottom-right-radius: 4px;
+    }
+    .admin-bubble .btime { font-size: 10px; opacity: 0.45; margin-top: 4px; display: block; }
+
+    .empty-panel {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      flex: 1; gap: 12px; color: var(--text-muted);
+      font-size: 13px; padding: 40px;
+      text-align: center;
+    }
+    .empty-icon { font-size: 40px; opacity: 0.4; }
+
+    /* ============================================================
+       FEEDBACK CHART
+    ============================================================ */
+    .feedback-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .feedback-card {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 18px; padding: 22px;
+    }
+
+    .feedback-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px; font-weight: 700;
+      color: var(--text); margin-bottom: 18px;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .donut-wrap {
+      display: flex; align-items: center;
+      justify-content: center; gap: 28px;
+    }
+
+    .donut-svg { width: 130px; height: 130px; }
+
+    .donut-legend { display: flex; flex-direction: column; gap: 10px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .legend-label { font-size: 12px; color: var(--text-soft); }
+    .legend-val { font-size: 14px; font-weight: 700; color: var(--text); }
+
+    .bar-list { display: flex; flex-direction: column; gap: 12px; }
+    .bar-item-label {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: var(--text-soft);
+      margin-bottom: 5px;
+    }
+    .bar-track {
+      height: 8px; border-radius: 20px;
+      background: rgba(138,90,255,0.12);
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%; border-radius: 20px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width 1s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    /* ============================================================
+       TOP QUESTIONS
+    ============================================================ */
+    .questions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .question-card {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px 18px;
+      display: flex; align-items: center; gap: 14px;
+      transition: all 0.22s;
+    }
+    .question-card:hover { border-color: var(--border2); box-shadow: var(--glow-sm); transform: translateY(-1px); }
+
+    .q-rank {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, rgba(138,90,255,0.22), rgba(201,97,255,0.12));
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 700;
+      color: var(--primary-l); flex-shrink: 0;
+    }
+
+    .q-content { flex: 1; min-width: 0; }
+    .q-text {
+      font-size: 13px; font-weight: 500; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 3px;
+    }
+    .q-count { font-size: 11px; color: var(--text-muted); }
+
+    .q-bar {
+      width: 100%; height: 4px; border-radius: 10px;
+      background: rgba(138,90,255,0.1); margin-top: 7px; overflow: hidden;
+    }
+    .q-bar-fill {
+      height: 100%; border-radius: 10px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    /* ============================================================
+       USERS TABLE
+    ============================================================ */
+    .search-bar {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px; padding: 9px 14px;
+      margin-bottom: 16px;
+      transition: border-color 0.2s;
+    }
+    .search-bar:focus-within { border-color: var(--border2); }
+    .search-bar input {
+      flex: 1; border: none; outline: none;
+      background: transparent;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px; color: var(--text);
+    }
+    .search-bar input::placeholder { color: var(--text-muted); }
+
+    /* ============================================================
+       TOAST
+    ============================================================ */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: 12px; padding: 11px 18px;
+      font-size: 13px; font-weight: 500; color: var(--text);
+      z-index: 999; display: flex; align-items: center; gap: 7px;
+      transform: translateY(20px); opacity: 0;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      box-shadow: 0 8px 28px rgba(0,0,0,0.4), var(--glow-sm);
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ============================================================
+       RESPONSIVE
+    ============================================================ */
+    @media (max-width: 900px) {
+      .chat-viewer-grid { grid-template-columns: 1fr; }
+      .session-list { max-height: 280px; }
+      .dash-content { padding: 16px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .dash-topbar { padding: 12px 16px; }
+      .dash-nav { padding: 10px 16px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .stat-value { font-size: 24px; }
+      .admin-info span { display: none; }
+      .dash-content { padding: 12px; }
+      .data-table th:nth-child(3),
+      .data-table td:nth-child(3) { display: none; }
+    }
+
+    @media (max-width: 400px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================
+     LOGIN SCREEN
+============================================================ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-badge">🛡️</div>
+    <h1>Admin Dashboard</h1>
+    <p>Iloilo Travel Guide AI — Admin Only.<br>Sign in with your authorized Google account to continue.</p>
+    <button class="google-login-btn" id="admin-google-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18">
+        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615Z"/>
+        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18Z"/>
+        <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332Z"/>
+        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58Z"/>
+      </svg>
+      Sign in with Google
+    </button>
+    <div id="login-error">⛔ Access denied. This account is not authorized as admin.</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN DASHBOARD
+============================================================ -->
+<div id="dashboard">
+
+  <!-- TOPBAR -->
+  <div class="dash-topbar">
+    <div class="dash-topbar-left">
+      <div class="dash-logo">🌺</div>
+      <div class="dash-title">
+        <h1>Admin Dashboard</h1>
+        <p>Iloilo Travel Guide AI</p>
+      </div>
+    </div>
+    <div class="dash-topbar-right">
+      <button class="refresh-btn" id="refresh-btn">
+        <span class="refresh-icon">🔄</span> Refresh
+      </button>
+      <div class="admin-info">
+        <div class="admin-avatar" id="admin-avatar">A</div>
+        <span id="admin-name">Admin</span>
+      </div>
+      <button class="signout-btn" id="signout-btn">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- NAV TABS -->
+  <div class="dash-nav">
+    <button class="nav-tab active" data-tab="overview">📊 Overview</button>
+    <button class="nav-tab" data-tab="chats">💬 Chat History</button>
+    <button class="nav-tab" data-tab="feedback">👍 Feedback</button>
+    <button class="nav-tab" data-tab="questions">🔥 Top Questions</button>
+    <button class="nav-tab" data-tab="users">👥 Users</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="dash-content">
+
+    <!-- ===== OVERVIEW TAB ===== -->
+    <div class="tab-panel active" id="tab-overview">
+      <div class="stats-grid">
+        <div class="stat-card purple">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value" id="stat-users">—</div>
+          <div class="stat-label">Total Users</div>
+          <div class="stat-sub">Registered accounts</div>
+        </div>
+        <div class="stat-card cyan">
+          <div class="stat-icon">💬</div>
+          <div class="stat-value" id="stat-sessions">—</div>
+          <div class="stat-label">Total Sessions</div>
+          <div class="stat-sub">All conversations</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-icon">📨</div>
+          <div class="stat-value" id="stat-messages">—</div>
+          <div class="stat-label">Total Messages</div>
+          <div class="stat-sub">User + AI messages</div>
+        </div>
+        <div class="stat-card pink">
+          <div class="stat-icon">👍</div>
+          <div class="stat-value" id="stat-thumbsup">—</div>
+          <div class="stat-label">Positive Feedback</div>
+          <div class="stat-sub">Thumbs up received</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-icon">👎</div>
+          <div class="stat-value" id="stat-thumbsdown">—</div>
+          <div class="stat-label">Negative Feedback</div>
+          <div class="stat-sub">Thumbs down received</div>
+        </div>
+      </div>
+
+      <!-- Recent Sessions -->
+      <div class="section-header">
+        <div class="section-title">🕐 Recent Conversations <span class="section-badge" id="recent-count">0</span></div>
+      </div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>First Message</th>
+              <th>Messages</th>
+              <th>Started</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recent-sessions-tbody">
+            <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ===== CHAT HISTORY TAB ===== -->
+    <div class="tab-panel" id="tab-chats">
+      <div class="section-header">
+        <div class="section-title">💬 Chat History Viewer</div>
+      </div>
+      <div class="chat-viewer-grid">
+        <div class="session-list">
+          <div class="session-list-header">Sessions <span id="session-count-badge" class="section-badge" style="margin-left:6px;">0</span></div>
+          <div class="session-items" id="session-items">
+            <div style="padding:20px;color:var(--text-muted);font-size:12px;text-align:center;">Loading sessions...</div>
+          </div>
+        </div>
+        <div class="chat-panel">
+          <div class="chat-panel-header">
+            <div>
+              <div class="chat-panel-title" id="chat-panel-title">Select a session</div>
+              <div class="chat-panel-sub" id="chat-panel-sub">Click any session on the left to view messages</div>
+            </div>
+          </div>
+          <div class="chat-messages-view" id="chat-messages-view">
+            <div class="empty-panel">
+              <div class="empty-icon">💬</div>
+              <div>Select a conversation to view messages</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== FEEDBACK TAB ===== -->
+    <div class="tab-panel" id="tab-feedback">
+      <div class="section-header">
+        <div class="section-title">👍 Feedback Analytics</div>
+      </div>
+      <div class="feedback-grid">
+        <div class="feedback-card">
+          <h3>📊 Feedback Distribution</h3>
+          <div class="donut-wrap">
+            <svg class="donut-svg" viewBox="0 0 42 42">
+              <circle cx="21" cy="21" r="15.9" fill="transparent" stroke="rgba(138,90,255,0.1)" stroke-width="6"/>
+              <circle id="donut-positive" cx="21" cy="21" r="15.9" fill="transparent"
+                stroke="#4ade80" stroke-width="6" stroke-dasharray="75 25"
+                stroke-dashoffset="25" transform="rotate(-90 21 21)"
+                style="transition: stroke-dasharray 1s ease;"/>
+              <circle id="donut-negative" cx="21" cy="21" r="15.9" fill="transparent"
+                stroke="#f87171" stroke-width="6" stroke-dasharray="25 75"
+                stroke-dashoffset="-50" transform="rotate(-90 21 21)"
+                style="transition: stroke-dasharray 1s ease;"/>
+              <text x="21" y="21.5" text-anchor="middle" fill="#f0ecff"
+                font-size="6" font-family="Space Grotesk" font-weight="700" id="donut-center">—</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--green)"></div>
+                <div>
+                  <div class="legend-label">Positive 👍</div>
+                  <div class="legend-val" id="legend-pos">0</div>
+                </div>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot" style="background:var(--red)"></div>
+                <div>
+                  <div class="legend-label">Negative 👎</div>
+                  <div class="legend-val" id="legend-neg">0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="feedback-card">
+          <h3>📈 Satisfaction Score</h3>
+          <div style="text-align:center;padding:16px 0;">
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:52px;font-weight:700;background:linear-gradient(135deg,var(--green),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;" id="satisfaction-score">—%</div>
+            <div style="color:var(--text-muted);font-size:13px;margin-top:6px;">User Satisfaction Rate</div>
+          </div>
+          <div class="bar-track" style="margin-top:12px;">
+            <div class="bar-fill" id="satisfaction-bar" style="width:0%"></div>
+          </div>
+        </div>
+
+        <div class="feedback-card" style="grid-column: 1 / -1;">
+          <h3>📋 Recent Feedback Log</h3>
+          <div class="data-table-wrap" style="border:none;border-radius:0;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Rating</th>
+                  <th>User</th>
+                  <th>Session ID</th>
+                  <th>Date & Time</th>
+                </tr>
+              </thead>
+              <tbody id="feedback-tbody">
+                <tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-muted);">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TOP QUESTIONS TAB ===== -->
+    <div class="tab-panel" id="tab-questions">
+      <div class="section-header">
+        <div class="section-title">🔥 Most Asked Topics</div>
+      </div>
+      <div class="questions-grid" id="questions-grid">
+        <div style="color:var(--text-muted);font-size:13px;padding:20px;">Analyzing conversations...</div>
+      </div>
+    </div>
+
+    <!-- ===== USERS TAB ===== -->
+    <div class="tab-panel" id="tab-users">
+      <div class="section-header">
+        <div class="section-title">👥 Registered Users <span class="section-badge" id="users-count-badge">0</span></div>
+      </div>
+      <div class="search-bar">
+        <span style="color:var(--text-muted)">🔍</span>
+        <input type="text" id="user-search" placeholder="Search by name or email..." />
+      </div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Email</th>
+              <th>Last Seen</th>
+              <th>Sessions</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody">
+            <tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted);">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /dash-content -->
+</div><!-- /dashboard -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ============================================================
+     FIREBASE + ADMIN SCRIPTS
+============================================================ -->
+<script type="module">
+  import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, getDocs, query, orderBy, limit, where }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ── CONFIG ──────────────────────────────────────────────────
+  const firebaseConfig = {
+    apiKey: "AIzaSyCIIeK-1RY39DS4wK7fTwFbkX7EDIeaICU",
+    authDomain: "travel-guide-chatbot-16997.firebaseapp.com",
+    projectId: "travel-guide-chatbot-16997",
+    storageBucket: "travel-guide-chatbot-16997.firebasestorage.app",
+    messagingSenderId: "1066699951901",
+    appId: "1:1066699951901:web:d0a4a1d206aa09f1c15bf4",
+    measurementId: "G-GYYHLHQS3G"
+  };
+
+  // ✅ AUTHORIZED ADMIN EMAIL
+  const ADMIN_EMAILS = [
+    "bernasolhanna@gmail.com"
+  ];
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  // ── DOM REFS ────────────────────────────────────────────────
+  const loginScreen  = document.getElementById('login-screen');
+  const dashboard    = document.getElementById('dashboard');
+  const loginError   = document.getElementById('login-error');
+
+  // ── UTILS ───────────────────────────────────────────────────
+  function showToast(msg, emoji='ℹ️') {
+    const t = document.getElementById('toast');
+    t.innerHTML = `${emoji} ${msg}`;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function fmtDate(ts) {
+    if (!ts) return '—';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' })
+      + ' ' + d.toLocaleTimeString('en-PH', { hour:'2-digit', minute:'2-digit' });
+  }
+
+  function fmtDateShort(ts) {
+    if (!ts) return '—';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString('en-PH', { month:'short', day:'numeric' });
+  }
+
+  function escHtml(t) {
+    return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // ── AUTH ────────────────────────────────────────────────────
+  document.getElementById('admin-google-btn').addEventListener('click', async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const email  = result.user.email;
+      // If ADMIN_EMAILS is empty, allow any signed-in user (open mode)
+      if (ADMIN_EMAILS.length > 0 && !ADMIN_EMAILS.includes(email)) {
+        loginError.style.display = 'block';
+        await signOut(auth);
+      }
+    } catch (err) {
+      showToast('Sign-in error: ' + err.message, '❌');
+    }
+  });
+
+  document.getElementById('signout-btn').addEventListener('click', async () => {
+    await signOut(auth);
+    showToast('Signed out!', '👋');
+  });
+
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // Check admin access
+      if (ADMIN_EMAILS.length > 0 && !ADMIN_EMAILS.includes(user.email)) {
+        loginError.style.display = 'block';
+        await signOut(auth);
+        return;
+      }
+      loginScreen.style.display = 'none';
+      dashboard.style.display = 'block';
+      document.getElementById('admin-avatar').textContent = user.displayName?.[0]?.toUpperCase() || 'A';
+      document.getElementById('admin-name').textContent = user.displayName?.split(' ')[0] || 'Admin';
+      showToast(`Welcome back, ${user.displayName?.split(' ')[0]}! 🌺`, '✅');
+      await loadAllData();
+    } else {
+      loginScreen.style.display = 'flex';
+      dashboard.style.display  = 'none';
+    }
+  });
+
+  // ── TAB NAVIGATION ──────────────────────────────────────────
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // ── REFRESH ─────────────────────────────────────────────────
+  document.getElementById('refresh-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('refresh-btn');
+    btn.classList.add('spinning');
+    await loadAllData();
+    btn.classList.remove('spinning');
+    showToast('Data refreshed!', '🔄');
+  });
+
+  // ── LOAD ALL DATA ───────────────────────────────────────────
+  async function loadAllData() {
+    await Promise.all([
+      loadOverview(),
+      loadSessions(),
+      loadFeedback(),
+      loadUsers(),
+    ]);
+  }
+
+  // ── OVERVIEW ────────────────────────────────────────────────
+  async function loadOverview() {
+    try {
+      // Users count
+      const usersSnap = await getDocs(collection(db, 'users'));
+      document.getElementById('stat-users').textContent = usersSnap.size;
+
+      // Sessions + messages
+      const sessSnap = await getDocs(collection(db, 'conversations'));
+      document.getElementById('stat-sessions').textContent = sessSnap.size;
+      document.getElementById('recent-count').textContent  = sessSnap.size;
+      document.getElementById('session-count-badge').textContent = sessSnap.size;
+
+      let totalMessages = 0;
+      const rows = [];
+      sessSnap.forEach(d => {
+        const data = d.data();
+        const msgs = data.messages || [];
+        totalMessages += msgs.length;
+        rows.push({ id: d.id, data });
+      });
+      document.getElementById('stat-messages').textContent = totalMessages;
+
+      // Sort by startedAt desc
+      rows.sort((a, b) => {
+        const ta = a.data.startedAt?.toDate?.() || 0;
+        const tb = b.data.startedAt?.toDate?.() || 0;
+        return tb - ta;
+      });
+
+      // Recent sessions table
+      const tbody = document.getElementById('recent-sessions-tbody');
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">No conversations yet.</td></tr>';
+      } else {
+        tbody.innerHTML = rows.slice(0, 15).map(({ id, data }) => {
+          const msgs    = data.messages || [];
+          const first   = msgs.find(m => m.role === 'user')?.content || '—';
+          const isGuest = data.userId === 'guest';
+          return `<tr>
+            <td><span class="badge ${isGuest ? 'yellow' : 'purple'}">${isGuest ? '👤 Guest' : '✅ User'}</span></td>
+            <td class="td-main" title="${escHtml(first)}">${escHtml(first.substring(0, 55))}${first.length > 55 ? '…' : ''}</td>
+            <td><span class="badge purple">${msgs.length}</span></td>
+            <td>${fmtDate(data.startedAt)}</td>
+            <td><span class="badge green">✓ Complete</span></td>
+          </tr>`;
+        }).join('');
+      }
+
+      // Feedback counts
+      const fbSnap = await getDocs(collection(db, 'feedback'));
+      let up = 0, down = 0;
+      fbSnap.forEach(d => {
+        if (d.data().rating === 'thumbsUp') up++;
+        else down++;
+      });
+      document.getElementById('stat-thumbsup').textContent   = up;
+      document.getElementById('stat-thumbsdown').textContent = down;
+
+      // Top questions analysis
+      analyzeTopQuestions(rows);
+
+    } catch (e) {
+      console.error('Overview error:', e);
+      showToast('Error loading overview data', '❌');
+    }
+  }
+
+  // ── SESSIONS / CHAT VIEWER ───────────────────────────────────
+  async function loadSessions() {
+    try {
+      const snap = await getDocs(query(collection(db, 'conversations'), orderBy('startedAt', 'desc')));
+      const container = document.getElementById('session-items');
+
+      if (snap.empty) {
+        container.innerHTML = '<div style="padding:20px;color:var(--text-muted);font-size:12px;text-align:center;">No sessions yet.</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      snap.forEach(d => {
+        const data = d.data();
+        const msgs = data.messages || [];
+        const firstUser = msgs.find(m => m.role === 'user')?.content || 'Empty chat';
+        const isGuest = data.userId === 'guest';
+
+        const item = document.createElement('div');
+        item.className = 'session-item';
+        item.innerHTML = `
+          <div class="session-item-user">
+            <span>${isGuest ? '👤' : '✅'}</span>
+            ${isGuest ? 'Guest' : 'Signed-in User'}
+            <span class="badge purple" style="margin-left:auto;font-size:10px;">${msgs.length} msgs</span>
+          </div>
+          <div class="session-item-preview">${escHtml(firstUser.substring(0, 42))}${firstUser.length > 42 ? '…' : ''}</div>
+          <div class="session-item-time">${fmtDate(data.startedAt)}</div>
+        `;
+        item.addEventListener('click', () => {
+          document.querySelectorAll('.session-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          viewSession(d.id, data);
+        });
+        container.appendChild(item);
+      });
+
+    } catch (e) { console.error('Sessions error:', e); }
+  }
+
+  function viewSession(id, data) {
+    const msgs  = data.messages || [];
+    const title = document.getElementById('chat-panel-title');
+    const sub   = document.getElementById('chat-panel-sub');
+    const view  = document.getElementById('chat-messages-view');
+
+    title.textContent = `Session: ${id.substring(0, 20)}…`;
+    sub.textContent   = `${msgs.length} messages · Started ${fmtDate(data.startedAt)}`;
+
+    if (msgs.length === 0) {
+      view.innerHTML = '<div class="empty-panel"><div class="empty-icon">📭</div><div>No messages in this session</div></div>';
+      return;
+    }
+
+    view.innerHTML = msgs.map(m => `
+      <div class="admin-msg-row ${m.role === 'user' ? 'user-row' : 'bot-row'}">
+        <div class="admin-msg-av ${m.role === 'user' ? 'user-av' : 'bot-av'}">${m.role === 'user' ? '👤' : '🤖'}</div>
+        <div class="admin-bubble ${m.role === 'user' ? 'user-b' : 'bot-b'}">
+          ${escHtml(m.content)}
+          <span class="btime">${m.timestamp ? new Date(m.timestamp).toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit'}) : ''}</span>
+        </div>
+      </div>
+    `).join('');
+
+    view.scrollTop = view.scrollHeight;
+  }
+
+  // ── FEEDBACK ────────────────────────────────────────────────
+  async function loadFeedback() {
+    try {
+      const snap = await getDocs(query(collection(db, 'feedback'), orderBy('timestamp', 'desc')));
+      let up = 0, down = 0;
+      const rows = [];
+
+      snap.forEach(d => {
+        const data = d.data();
+        if (data.rating === 'thumbsUp') up++;
+        else down++;
+        rows.push(data);
+      });
+
+      const total = up + down;
+      const pct   = total > 0 ? Math.round((up / total) * 100) : 0;
+
+      // Donut chart
+      const posArc = total > 0 ? (up / total) * 100 : 0;
+      const negArc = 100 - posArc;
+      document.getElementById('donut-positive').setAttribute('stroke-dasharray', `${posArc} ${100 - posArc}`);
+      document.getElementById('donut-negative').setAttribute('stroke-dasharray', `${negArc} ${100 - negArc}`);
+      document.getElementById('donut-negative').setAttribute('stroke-dashoffset', -(posArc + 25));
+      document.getElementById('donut-center').textContent = total > 0 ? `${pct}%` : '—';
+
+      document.getElementById('legend-pos').textContent = up;
+      document.getElementById('legend-neg').textContent = down;
+      document.getElementById('satisfaction-score').textContent = total > 0 ? `${pct}%` : '—%';
+      document.getElementById('satisfaction-bar').style.width = pct + '%';
+
+      // Table
+      const tbody = document.getElementById('feedback-tbody');
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:var(--text-muted);">No feedback yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = rows.slice(0, 30).map(r => `
+        <tr>
+          <td>${r.rating === 'thumbsUp'
+            ? '<span class="badge green">👍 Positive</span>'
+            : '<span class="badge red">👎 Negative</span>'}</td>
+          <td>${r.userId === 'guest' ? '<span class="badge yellow">Guest</span>' : '<span class="badge purple">User</span>'}</td>
+          <td style="font-size:11px;color:var(--text-muted);">${(r.sessionId||'—').substring(0,24)}…</td>
+          <td>${fmtDate(r.timestamp)}</td>
+        </tr>
+      `).join('');
+
+    } catch (e) { console.error('Feedback error:', e); }
+  }
+
+  // ── TOP QUESTIONS ANALYSIS ───────────────────────────────────
+  function analyzeTopQuestions(sessionRows) {
+    const keywords = {
+      'Islas de Gigantes': ['gigantes','island','islands','carles','scallop','beach'],
+      'La Paz Batchoy':    ['batchoy','batchoi','la paz','noodle','soup'],
+      'Dinagyang Festival':['dinagyang','festival','january','street dance','tribe'],
+      'Guimaras Island':   ['guimaras','mango','mangoes','parola'],
+      'Accommodations':    ['hotel','hotels','stay','accommodation','sleep','lodge'],
+      'Transportation':    ['jeepney','tricycle','grab','taxi','bus','transport','how to get','ride'],
+      'Miagao Church':     ['miagao','church','heritage','unesco','baroque'],
+      'Food & Restaurants':['eat','food','restaurant','kain','dining','tatoy','breakthrough','smalltalk'],
+      'Budget Guide':      ['budget','cost','how much','price','cheap','afford','₱'],
+      'Molo Church':       ['molo','feminist','saint','saints'],
+      'Esplanade':         ['esplanade','riverside','river','sunset','walk'],
+      'Garin Farm':        ['garin','farm','noah','ark','pilgrimage'],
+    };
+
+    const counts = {};
+    Object.keys(keywords).forEach(k => counts[k] = 0);
+
+    sessionRows.forEach(({ data }) => {
+      const msgs = data.messages || [];
+      msgs.filter(m => m.role === 'user').forEach(m => {
+        const text = m.content.toLowerCase();
+        Object.entries(keywords).forEach(([topic, kws]) => {
+          if (kws.some(kw => text.includes(kw))) counts[topic]++;
+        });
+      });
+    });
+
+    const sorted = Object.entries(counts)
+      .sort((a,b) => b[1] - a[1])
+      .filter(([,c]) => c >= 0);
+
+    const max = sorted[0]?.[1] || 1;
+    const grid = document.getElementById('questions-grid');
+
+    if (sorted.every(([,c]) => c === 0)) {
+      grid.innerHTML = '<div style="color:var(--text-muted);font-size:13px;padding:20px;grid-column:1/-1;">Not enough data yet. Start chatting to see analytics!</div>';
+      return;
+    }
+
+    grid.innerHTML = sorted.map(([topic, count], i) => `
+      <div class="question-card">
+        <div class="q-rank">#${i+1}</div>
+        <div class="q-content">
+          <div class="q-text">${topic}</div>
+          <div class="q-count">${count} mention${count !== 1 ? 's' : ''}</div>
+          <div class="q-bar">
+            <div class="q-bar-fill" style="width:${max > 0 ? Math.round((count/max)*100) : 0}%"></div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // ── USERS ────────────────────────────────────────────────────
+  let allUsers = [];
+
+  async function loadUsers() {
+    try {
+      const snap     = await getDocs(collection(db, 'users'));
+      const sessSnap = await getDocs(collection(db, 'conversations'));
+
+      // Count sessions per user
+      const sessCount = {};
+      sessSnap.forEach(d => {
+        const uid = d.data().userId;
+        if (uid && uid !== 'guest') sessCount[uid] = (sessCount[uid] || 0) + 1;
+      });
+
+      allUsers = [];
+      snap.forEach(d => {
+        allUsers.push({ id: d.id, ...d.data(), sessions: sessCount[d.id] || 0 });
+      });
+
+      document.getElementById('users-count-badge').textContent = allUsers.length;
+      renderUsersTable(allUsers);
+
+    } catch (e) { console.error('Users error:', e); }
+  }
+
+  function renderUsersTable(users) {
+    const tbody = document.getElementById('users-tbody');
+    if (users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--text-muted);">No registered users yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = users.map(u => `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:9px;">
+            <div style="width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:#fff;flex-shrink:0;">
+              ${(u.name||'?')[0].toUpperCase()}
+            </div>
+            <span class="td-main">${escHtml(u.name || '—')}</span>
+          </div>
+        </td>
+        <td style="color:var(--text-muted);font-size:12px;">${escHtml(u.email || '—')}</td>
+        <td>${fmtDateShort(u.lastSeen)}</td>
+        <td><span class="badge purple">${u.sessions} sessions</span></td>
+      </tr>
+    `).join('');
+  }
+
+  // User search
+  document.getElementById('user-search').addEventListener('input', e => {
+    const q = e.target.value.toLowerCase();
+    renderUsersTable(allUsers.filter(u =>
+      (u.name||'').toLowerCase().includes(q) ||
+      (u.email||'').toLowerCase().includes(q)
+    ));
+  });
+
+</script>
+</body>
+</html>
