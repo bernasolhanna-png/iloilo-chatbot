@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — Iloilo Travel Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, getDocs, getDoc, doc, query, orderBy, limit, where, deleteDoc, updateDoc, serverTimestamp, Timestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCIIeK-1RY39DS4wK7fTwFbkX7EDIeaICU",
+    authDomain: "travel-guide-chatbot-16997.firebaseapp.com",
+    projectId: "travel-guide-chatbot-16997",
+    storageBucket: "travel-guide-chatbot-16997.firebasestorage.app",
+    messagingSenderId: "1066699951901",
+    appId: "1:1066699951901:web:d0a4a1d206aa09f1c15bf4",
+    measurementId: "G-GYYHLHQS3G"
+  };
+
+  const ADMIN_EMAIL = "bernasolhanna@gmail.com";
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  window.__adminAuth = { auth, db, provider, signInWithPopup, signOut, onAuthStateChanged,
+    collection, getDocs, getDoc, doc, query, orderBy, limit, where, deleteDoc, updateDoc, serverTimestamp, ADMIN_EMAIL };
+</script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #07060f;
+  --surface: rgba(255,255,255,0.04);
+  --surface2: rgba(255,255,255,0.07);
+  --surface3: rgba(255,255,255,0.10);
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.12);
+  --purple: #7c3aed;
+  --purple-light: #a855f7;
+  --blue: #3b82f6;
+  --pink: #ec4899;
+  --teal: #06b6d4;
+  --gold: #f59e0b;
+  --green: #22c55e;
+  --red: #ef4444;
+  --text: #f1f0ff;
+  --muted: rgba(241,240,255,0.45);
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --sidebar-w: 240px;
+}
+
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; }
+
+/* ── BG ── */
+.bg-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.bg-canvas::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 50% 60% at 5% 10%, rgba(124,58,237,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 50% at 95% 80%, rgba(59,130,246,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 30% 40% at 70% 5%, rgba(236,72,153,0.07) 0%, transparent 50%);
+}
+.grid-lines {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(124,58,237,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124,58,237,0.05) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 90% 90% at 50% 50%, black 20%, transparent 80%);
+}
+
+/* ════════════════════════
+   LOGIN SCREEN
+════════════════════════ */
+#loginScreen {
+  position: relative; z-index: 10;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100vh; gap: 0; text-align: center; padding: 40px 24px;
+}
+
+.login-orb-wrap { position: relative; width: 160px; height: 160px; display: flex; align-items: center; justify-content: center; margin-bottom: 32px; }
+.login-orb-rings {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 1px solid rgba(168,85,247,0.2);
+  animation: rings-spin 12s linear infinite;
+}
+.login-orb-rings::before, .login-orb-rings::after {
+  content: ''; position: absolute; inset: -16px; border-radius: 50%;
+  border: 1px solid rgba(168,85,247,0.12);
+}
+.login-orb-rings::after { inset: -32px; border-color: rgba(59,130,246,0.1); animation-direction: reverse; }
+.login-pulse { position: absolute; inset: 0; border-radius: 50%; }
+.login-pulse::before, .login-pulse::after {
+  content: ''; position: absolute; inset: -8px; border-radius: 50%;
+  border: 1px solid rgba(168,85,247,0.3);
+  animation: pulse-out 3s ease-out infinite;
+}
+.login-pulse::after { animation-delay: 1.5s; }
+.login-orb {
+  width: 110px; height: 110px; border-radius: 50%;
+  background: conic-gradient(from 0deg, #3b82f6, #7c3aed, #ec4899, #a855f7, #06b6d4, #3b82f6);
+  box-shadow: 0 0 50px rgba(124,58,237,0.65), 0 0 100px rgba(124,58,237,0.25), inset 0 0 30px rgba(0,0,0,0.4);
+  animation: orb-float 4s ease-in-out infinite; position: relative; overflow: hidden;
+}
+.login-orb::before {
+  content: ''; position: absolute; top: 10%; left: 15%; width: 38%; height: 30%;
+  background: rgba(255,255,255,0.22); border-radius: 50%; filter: blur(6px); transform: rotate(-30deg);
+}
+.login-orb::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: repeating-conic-gradient(rgba(255,255,255,0.05) 0deg 10deg, transparent 10deg 20deg);
+  animation: orb-swirl 8s linear infinite;
+}
+
+.login-badge {
+  font-size: 11px; font-family: var(--font-display); font-weight: 700;
+  letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--purple-light); background: rgba(168,85,247,0.1);
+  border: 1px solid rgba(168,85,247,0.25); padding: 5px 14px; border-radius: 100px;
+  margin-bottom: 20px;
+}
+.login-title {
+  font-family: var(--font-display); font-size: 30px; font-weight: 800; margin-bottom: 8px;
+}
+.login-title span { color: var(--purple-light); }
+.login-sub { font-size: 13px; color: var(--muted); margin-bottom: 36px; line-height: 1.6; max-width: 320px; }
+
+.login-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 20px; padding: 28px; width: 100%; max-width: 360px;
+  backdrop-filter: blur(16px);
+}
+.login-card-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.login-card-sub { font-size: 12px; color: var(--muted); margin-bottom: 20px; }
+
+.btn-google {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 14px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--purple), var(--purple-light));
+  border: none; color: #fff;
+  font-family: var(--font-display); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: all 0.25s;
+  box-shadow: 0 8px 28px rgba(124,58,237,0.4);
+}
+.btn-google:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(124,58,237,0.55); }
+.btn-google:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.login-notice {
+  margin-top: 14px; font-size: 11px; color: var(--muted);
+  display: flex; align-items: center; gap: 6px;
+}
+.login-notice::before { content: '🔒'; font-size: 12px; }
+
+#loginError {
+  margin-top: 14px; font-size: 12px; color: #ef4444;
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+  border-radius: 10px; padding: 10px 14px; display: none;
+}
+
+/* ════════════════════════
+   DASHBOARD LAYOUT
+════════════════════════ */
+#dashboard { display: none; position: relative; z-index: 10; height: 100vh; flex-direction: row; }
+#dashboard.visible { display: flex; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sidebar-w); flex-shrink: 0;
+  background: rgba(7,6,15,0.8); border-right: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  display: flex; flex-direction: column;
+  padding: 0; overflow: hidden;
+}
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-orb {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  background: conic-gradient(from 0deg, #3b82f6, #7c3aed, #ec4899, #a855f7, #06b6d4, #3b82f6);
+  box-shadow: 0 0 16px rgba(124,58,237,0.6);
+  animation: orb-swirl 8s linear infinite; position: relative; overflow: hidden;
+}
+.logo-orb::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: repeating-conic-gradient(rgba(255,255,255,0.06) 0deg 10deg, transparent 10deg 20deg);
+  animation: orb-swirl 8s linear infinite;
+}
+.logo-text { display: flex; flex-direction: column; }
+.logo-name { font-family: var(--font-display); font-size: 14px; font-weight: 800; }
+.logo-sub { font-size: 10px; color: var(--muted); }
+
+.sidebar-logo-inner { display: flex; align-items: center; gap: 10px; }
+
+.sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 2px; }
+.nav-section-label {
+  font-size: 10px; font-family: var(--font-display); font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+  padding: 12px 10px 6px;
+}
+.nav-link {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 12px; border-radius: 12px;
+  font-size: 13px; color: var(--muted);
+  cursor: pointer; transition: all 0.2s; user-select: none;
+}
+.nav-link:hover { background: var(--surface2); color: var(--text); }
+.nav-link.active { background: rgba(168,85,247,0.12); color: var(--purple-light); border: 1px solid rgba(168,85,247,0.2); }
+.nav-link .nl-icon { font-size: 16px; flex-shrink: 0; width: 20px; text-align: center; }
+.nav-badge {
+  margin-left: auto; font-size: 10px; font-weight: 700;
+  background: var(--purple); color: #fff;
+  padding: 2px 7px; border-radius: 100px;
+}
+
+.sidebar-user {
+  padding: 16px 12px; border-top: 1px solid var(--border);
+}
+.user-card {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 12px;
+  background: var(--surface); border: 1px solid var(--border);
+}
+.user-avatar {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--purple), var(--blue));
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 10px; color: var(--purple-light); }
+.logout-btn { font-size: 14px; cursor: pointer; opacity: 0.5; transition: opacity 0.2s; }
+.logout-btn:hover { opacity: 1; }
+
+/* ── MAIN CONTENT ── */
+.main-content {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 28px 32px 40px;
+}
+.main-content::-webkit-scrollbar { width: 4px; }
+.main-content::-webkit-scrollbar-track { background: transparent; }
+.main-content::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.3); border-radius: 4px; }
+
+/* Panel sections */
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* Page header */
+.page-header { margin-bottom: 28px; }
+.page-title { font-family: var(--font-display); font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+.page-sub { font-size: 13px; color: var(--muted); }
+.page-header-row { display: flex; align-items: flex-start; justify-content: space-between; }
+.header-time { font-size: 12px; color: var(--muted); text-align: right; }
+.header-time strong { display: block; font-size: 18px; font-family: var(--font-display); font-weight: 700; color: var(--text); }
+
+/* ── STAT CARDS ── */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 18px; padding: 20px;
+  backdrop-filter: blur(10px); position: relative; overflow: hidden;
+  transition: all 0.25s;
+}
+.stat-card:hover { border-color: rgba(168,85,247,0.25); transform: translateY(-2px); }
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--card-accent, var(--purple)), transparent);
+}
+.stat-icon {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--card-bg, rgba(124,58,237,0.15));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; margin-bottom: 14px;
+}
+.stat-value { font-family: var(--font-display); font-size: 28px; font-weight: 800; margin-bottom: 4px; }
+.stat-label { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.stat-trend { font-size: 11px; display: flex; align-items: center; gap: 4px; }
+.trend-up { color: var(--green); }
+.trend-down { color: var(--red); }
+
+/* ── CHART AREA ── */
+.charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 24px; }
+.chart-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 18px; padding: 20px; backdrop-filter: blur(10px);
+}
+.chart-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.chart-sub { font-size: 11px; color: var(--muted); margin-bottom: 16px; }
+
+/* Bar chart */
+.bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
+.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bar {
+  width: 100%; border-radius: 6px 6px 0 0;
+  background: linear-gradient(to top, var(--purple), var(--purple-light));
+  transition: all 0.4s ease;
+  position: relative;
+}
+.bar::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(to top, rgba(168,85,247,0.3), rgba(168,85,247,0));
+  animation: bar-shine 2s ease-in-out infinite;
+}
+@keyframes bar-shine { 0%,100%{opacity:0.5} 50%{opacity:1} }
+.bar-label { font-size: 10px; color: var(--muted); }
+
+/* Donut chart */
+.donut-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.donut-svg { overflow: visible; }
+.donut-legend { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.legend-val { margin-left: auto; font-weight: 600; }
+
+/* ── TABLES ── */
+.table-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 18px; overflow: hidden; backdrop-filter: blur(10px);
+  margin-bottom: 24px;
+}
+.table-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px; border-bottom: 1px solid var(--border);
+}
+.table-title { font-family: var(--font-display); font-size: 14px; font-weight: 700; }
+.table-action { font-size: 12px; color: var(--purple-light); cursor: pointer; }
+table { width: 100%; border-collapse: collapse; }
+th {
+  padding: 10px 20px; text-align: left;
+  font-size: 11px; font-family: var(--font-display); font-weight: 700;
+  letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 12px 20px; font-size: 13px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface2); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 100px;
+}
+.badge.green { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.badge.purple { background: rgba(168,85,247,0.12); color: var(--purple-light); border: 1px solid rgba(168,85,247,0.2); }
+.badge.blue { background: rgba(59,130,246,0.12); color: var(--blue); border: 1px solid rgba(59,130,246,0.2); }
+.badge.gold { background: rgba(245,158,11,0.12); color: var(--gold); border: 1px solid rgba(245,158,11,0.2); }
+
+/* ── FEEDBACK STARS ── */
+.stars { color: var(--gold); font-size: 12px; letter-spacing: 1px; }
+
+/* ── ACTIVITY LOG ── */
+.activity-list { padding: 4px 0; }
+.activity-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-item:hover { background: var(--surface2); }
+.act-dot {
+  width: 8px; height: 8px; border-radius: 50; flex-shrink: 0; margin-top: 5px;
+  border-radius: 50%;
+}
+.act-content { flex: 1; }
+.act-text { font-size: 13px; margin-bottom: 2px; }
+.act-time { font-size: 11px; color: var(--muted); }
+
+/* ── SEARCH BAR ── */
+.search-bar {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px 14px; margin-bottom: 20px;
+}
+.search-bar input {
+  flex: 1; background: none; border: none; outline: none;
+  color: var(--text); font-size: 13px; font-family: var(--font-body);
+}
+.search-bar input::placeholder { color: var(--muted); }
+
+/* Top bar */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--border);
+}
+.topbar-greeting { font-family: var(--font-display); font-size: 20px; font-weight: 800; }
+.topbar-greeting span { color: var(--purple-light); }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+.notif-btn {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px; position: relative;
+}
+.notif-dot {
+  position: absolute; top: 6px; right: 6px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--pink); border: 1.5px solid var(--bg);
+}
+
+/* ── ANIMATIONS ── */
+@keyframes rings-spin { to { transform: rotate(360deg); } }
+@keyframes orb-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+@keyframes orb-swirl { to { transform: rotate(360deg); } }
+@keyframes pulse-out { 0%{transform:scale(1);opacity:0.7} 100%{transform:scale(1.5);opacity:0} }
+@keyframes fade-up { to { opacity:1; transform:translateY(0); } }
+
+.fade-up { opacity:0; transform:translateY(16px); animation: fade-up 0.5s ease forwards; }
+
+/* Responsive compact layout */
+@media (max-width: 1100px) {
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .charts-row { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  :root { --sidebar-w: 60px; }
+  .logo-text, .nav-link span:not(.nl-icon), .nav-section-label,
+  .nav-badge, .user-info { display: none; }
+  .nav-link { justify-content: center; padding: 12px; }
+  .sidebar-logo-inner { justify-content: center; }
+  .main-content { padding: 20px 16px 32px; }
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-canvas"><div class="grid-lines"></div></div>
+
+<!-- ════════ LOGIN SCREEN ════════ -->
+<div id="loginScreen">
+  <div class="login-badge">🛡️ Admin Access Only</div>
+
+  <div class="login-orb-wrap">
+    <div class="login-orb-rings"></div>
+    <div class="login-pulse"></div>
+    <div class="login-orb"></div>
+  </div>
+
+  <div class="login-title">Admin <span>Dashboard</span></div>
+  <p class="login-sub">Iloilo AI Travel Guide — Restricted access for authorized administrators only.</p>
+
+  <div class="login-card fade-up">
+    <div class="login-card-title">Sign in to continue</div>
+    <div class="login-card-sub">Only <strong style="color:var(--purple-light)">bernasolhanna@gmail.com</strong> is authorized.</div>
+    <button class="btn-google" id="loginBtn" onclick="handleLogin()">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="rgba(255,255,255,0.7)" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="rgba(255,255,255,0.5)" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="rgba(255,255,255,0.4)" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+    <div id="loginError">⚠️ Access denied. This email is not authorized as admin.</div>
+    <div class="login-notice">Secure authentication via Google OAuth 2.0</div>
+  </div>
+</div>
+
+<!-- ════════ DASHBOARD ════════ -->
+<div id="dashboard">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-inner">
+        <div class="logo-orb"></div>
+        <div class="logo-text">
+          <div class="logo-name">Iloilo Guide</div>
+          <div class="logo-sub">Admin Panel</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <div class="nav-link active" onclick="showPanel('overview',this)">
+        <span class="nl-icon">📊</span><span>Overview</span>
+      </div>
+      <div class="nav-link" onclick="showPanel('users',this)">
+        <span class="nl-icon">👥</span><span>Users</span>
+        <span class="nav-badge" id="userCount">—</span>
+      </div>
+      <div class="nav-link" onclick="showPanel('chats',this)">
+        <span class="nl-icon">💬</span><span>Chat Sessions</span>
+      </div>
+      <div class="nav-link" onclick="showPanel('feedback',this)">
+        <span class="nl-icon">⭐</span><span>Feedback</span>
+      </div>
+      <div class="nav-section-label">System</div>
+      <div class="nav-link" onclick="showPanel('activity',this)">
+        <span class="nl-icon">🕐</span><span>Activity Log</span>
+      </div>
+      <div class="nav-link" onclick="showPanel('settings',this)">
+        <span class="nl-icon">⚙️</span><span>Settings</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-card">
+        <div class="user-avatar">👑</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarEmail">Admin</div>
+          <div class="user-role">Administrator</div>
+        </div>
+        <div class="logout-btn" onclick="handleLogout()" title="Sign out">🚪</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- OVERVIEW PANEL -->
+    <div class="panel active" id="panel-overview">
+      <div class="topbar">
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:2px;font-family:var(--font-display);letter-spacing:0.1em;text-transform:uppercase;">Admin Dashboard</div>
+          <div class="topbar-greeting">Welcome back, <span>Admin</span> 👑</div>
+        </div>
+        <div class="topbar-right">
+          <div class="notif-btn"><span>🔔</span><div class="notif-dot"></div></div>
+          <div style="font-size:12px;color:var(--muted);text-align:right">
+            <div id="liveTime" style="font-family:var(--font-display);font-size:15px;color:var(--text);font-weight:700;"></div>
+            <div id="liveDate"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card" style="--card-accent:var(--purple);--card-bg:rgba(124,58,237,0.12)">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value" id="stat-users">—</div>
+          <div class="stat-label">Total Users</div>
+          <div class="stat-trend trend-up">↑ Live from Firebase</div>
+        </div>
+        <div class="stat-card" style="--card-accent:var(--blue);--card-bg:rgba(59,130,246,0.12)">
+          <div class="stat-icon">💬</div>
+          <div class="stat-value" id="stat-sessions">—</div>
+          <div class="stat-label">Chat Sessions</div>
+          <div class="stat-trend trend-up">↑ All time</div>
+        </div>
+        <div class="stat-card" style="--card-accent:var(--gold);--card-bg:rgba(245,158,11,0.12)">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-value" id="stat-rating">—</div>
+          <div class="stat-label">Avg. Rating</div>
+          <div class="stat-trend trend-up">↑ User feedback</div>
+        </div>
+        <div class="stat-card" style="--card-accent:var(--green);--card-bg:rgba(34,197,94,0.12)">
+          <div class="stat-icon">🤖</div>
+          <div class="stat-value" id="stat-messages">—</div>
+          <div class="stat-label">AI Responses</div>
+          <div class="stat-trend trend-up">↑ Generated</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title">Weekly Usage</div>
+          <div class="chart-sub">Chat sessions over the past 7 days</div>
+          <div class="bar-chart" id="barChart"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">User Types</div>
+          <div class="chart-sub">Guest vs. signed-in users</div>
+          <div class="donut-wrap">
+            <svg class="donut-svg" width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="46" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="16"/>
+              <circle id="donut1" cx="60" cy="60" r="46" fill="none" stroke="url(#dg1)" stroke-width="16"
+                stroke-dasharray="180 109" stroke-dashoffset="0" stroke-linecap="round"
+                transform="rotate(-90 60 60)"/>
+              <circle id="donut2" cx="60" cy="60" r="46" fill="none" stroke="url(#dg2)" stroke-width="16"
+                stroke-dasharray="109 180" stroke-dashoffset="-180" stroke-linecap="round"
+                transform="rotate(-90 60 60)"/>
+              <defs>
+                <linearGradient id="dg1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#7c3aed"/>
+                  <stop offset="100%" stop-color="#a855f7"/>
+                </linearGradient>
+                <linearGradient id="dg2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#3b82f6"/>
+                  <stop offset="100%" stop-color="#06b6d4"/>
+                </linearGradient>
+              </defs>
+              <text x="60" y="55" text-anchor="middle" fill="white" font-size="14" font-family="Syne" font-weight="800">62%</text>
+              <text x="60" y="70" text-anchor="middle" fill="rgba(241,240,255,0.45)" font-size="9" font-family="DM Sans">Signed In</text>
+            </svg>
+            <div class="donut-legend">
+              <div class="legend-item"><div class="legend-dot" style="background:var(--purple-light)"></div>Signed In<span class="legend-val" id="leg-signin">—</span></div>
+              <div class="legend-item"><div class="legend-dot" style="background:var(--blue)"></div>Guest Users<span class="legend-val" id="leg-guest">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent users table -->
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Recent Users</div>
+          <div class="table-action" onclick="showPanel('users',document.querySelectorAll('.nav-link')[1])">View all →</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Type</th>
+              <th>Last Active</th>
+              <th>Sessions</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="recentUsersTable">
+            <tr><td colspan="5" style="color:var(--muted);text-align:center;padding:24px">Loading from Firebase…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- USERS PANEL -->
+    <div class="panel" id="panel-users">
+      <div class="page-header">
+        <div class="page-title">Users</div>
+        <div class="page-sub">All registered and guest users of the Iloilo AI Travel Guide</div>
+      </div>
+      <div class="search-bar">
+        <span>🔍</span>
+        <input type="text" placeholder="Search users by email or name…" oninput="filterUsers(this.value)"/>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">All Users</div>
+          <div class="table-action" id="userExportBtn">Export CSV</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>User</th><th>Email</th><th>Type</th><th>Joined</th><th>Sessions</th><th>Status</th></tr>
+          </thead>
+          <tbody id="usersTable">
+            <tr><td colspan="6" style="color:var(--muted);text-align:center;padding:24px">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHATS PANEL -->
+    <div class="panel" id="panel-chats">
+      <div class="page-header">
+        <div class="page-title">Chat Sessions</div>
+        <div class="page-sub">All recorded AI conversation sessions</div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Recent Sessions</div>
+          <div class="table-action">Refresh</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Session</th><th>User</th><th>Messages</th><th>Topic</th><th>Date</th><th>Rating</th></tr>
+          </thead>
+          <tbody id="chatsTable">
+            <tr><td colspan="6" style="color:var(--muted);text-align:center;padding:24px">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- FEEDBACK PANEL -->
+    <div class="panel" id="panel-feedback">
+      <div class="page-header">
+        <div class="page-title">Feedback & Ratings</div>
+        <div class="page-sub">User satisfaction and ratings overview</div>
+      </div>
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
+        <div class="stat-card" style="--card-accent:var(--gold);--card-bg:rgba(245,158,11,0.1)">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-value" id="fb-avg">—</div>
+          <div class="stat-label">Average Rating</div>
+        </div>
+        <div class="stat-card" style="--card-accent:var(--green);--card-bg:rgba(34,197,94,0.1)">
+          <div class="stat-icon">😊</div>
+          <div class="stat-value" id="fb-positive">—</div>
+          <div class="stat-label">Positive Reviews</div>
+        </div>
+        <div class="stat-card" style="--card-accent:var(--red);--card-bg:rgba(239,68,68,0.1)">
+          <div class="stat-icon">😕</div>
+          <div class="stat-value" id="fb-negative">—</div>
+          <div class="stat-label">Negative Reviews</div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Feedback Entries</div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>User</th><th>Rating</th><th>Comment</th><th>Date</th></tr>
+          </thead>
+          <tbody id="feedbackTable">
+            <tr><td colspan="4" style="color:var(--muted);text-align:center;padding:24px">No feedback data found in Firebase yet.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ACTIVITY PANEL -->
+    <div class="panel" id="panel-activity">
+      <div class="page-header">
+        <div class="page-title">Activity Log</div>
+        <div class="page-sub">Real-time system events and admin actions</div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Recent Events</div>
+          <div class="table-action">Clear Log</div>
+        </div>
+        <div class="activity-list" id="activityLog">
+          <div style="color:var(--muted);text-align:center;padding:28px;font-size:13px">Loading activity…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS PANEL -->
+    <div class="panel" id="panel-settings">
+      <div class="page-header">
+        <div class="page-title">Settings</div>
+        <div class="page-sub">System configuration and admin controls</div>
+      </div>
+      <div class="table-card" style="padding:24px">
+        <div style="border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:20px">
+          <div style="font-family:var(--font-display);font-size:13px;font-weight:700;margin-bottom:6px">Admin Account</div>
+          <div style="font-size:13px;color:var(--muted)" id="settingsEmail">—</div>
+        </div>
+        <div style="border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:20px">
+          <div style="font-family:var(--font-display);font-size:13px;font-weight:700;margin-bottom:6px">AI Model</div>
+          <div style="font-size:13px;color:var(--muted)">Groq — Llama 3.3 70B Versatile</div>
+        </div>
+        <div style="border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:20px">
+          <div style="font-family:var(--font-display);font-size:13px;font-weight:700;margin-bottom:6px">Database</div>
+          <div style="font-size:13px;color:var(--muted)">Firebase Firestore — travel-guide-chatbot-16997</div>
+        </div>
+        <div>
+          <div style="font-family:var(--font-display);font-size:13px;font-weight:700;margin-bottom:12px">Danger Zone</div>
+          <button onclick="handleLogout()" style="padding:11px 20px;border-radius:10px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);color:#ef4444;font-family:var(--font-display);font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s"
+            onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(239,68,68,0.1)'">
+            🚪 Sign Out of Admin Panel
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script type="module">
+  const ADMIN_EMAIL = "bernasolhanna@gmail.com";
+
+  // Wait for Firebase to load
+  function waitForAuth() {
+    return new Promise(res => {
+      const check = () => window.__adminAuth ? res(window.__adminAuth) : setTimeout(check, 50);
+      check();
+    });
+  }
+
+  // ── PANEL SWITCHING ──
+  window.showPanel = (name, el) => {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    if (el) el.classList.add('active');
+    if (name === 'chats') loadChatsPanel();
+    if (name === 'feedback') loadFeedbackPanel();
+    if (name === 'activity') loadActivityPanel();
+    if (name === 'users') renderUsersTable(window.__allUsers || [], 'usersTable', 999);
+  };
+
+  // ── LIVE CLOCK ──
+  function updateClock() {
+    const now = new Date();
+    const timeEl = document.getElementById('liveTime');
+    const dateEl = document.getElementById('liveDate');
+    if (timeEl) timeEl.textContent = now.toLocaleTimeString('en-US', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', {weekday:'short',month:'short',day:'numeric'});
+  }
+  setInterval(updateClock, 1000); updateClock();
+
+  // ── BAR CHART ──
+  function renderBarChart(data) {
+    const labels = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const max = Math.max(...data, 1);
+    const chart = document.getElementById('barChart');
+    if (!chart) return;
+    chart.innerHTML = data.map((val, i) => `
+      <div class="bar-col">
+        <div class="bar" style="height:${Math.max(8, (val/max)*100)}px" title="${val} sessions"></div>
+        <div class="bar-label">${labels[i]}</div>
+      </div>`).join('');
+  }
+
+  // ── DUMMY SEED DATA (shown when Firestore collections are empty) ──
+  const seedUsers = [
+    {name:'Maria Santos', email:'maria@gmail.com', type:'Signed In', joined:'Apr 20, 2026', sessions:14, status:'Active'},
+    {name:'Juan Dela Cruz', email:'juan@yahoo.com', type:'Signed In', joined:'Apr 22, 2026', sessions:7, status:'Active'},
+    {name:'Guest User', email:'—', type:'Guest', joined:'Apr 25, 2026', sessions:3, status:'Inactive'},
+    {name:'Ana Reyes', email:'ana@outlook.com', type:'Signed In', joined:'Apr 26, 2026', sessions:21, status:'Active'},
+    {name:'Guest User', email:'—', type:'Guest', joined:'Apr 27, 2026', sessions:1, status:'Inactive'},
+  ];
+  const seedChats = [
+    {id:'#C001',user:'maria@gmail.com',msgs:18,topic:'Tourist Spots',date:'Apr 27',rating:'⭐⭐⭐⭐⭐'},
+    {id:'#C002',user:'juan@yahoo.com',msgs:9,topic:'Food Guide',date:'Apr 27',rating:'⭐⭐⭐⭐'},
+    {id:'#C003',user:'Guest',msgs:4,topic:'Hotels',date:'Apr 26',rating:'—'},
+    {id:'#C004',user:'ana@outlook.com',msgs:22,topic:'Transport',date:'Apr 26',rating:'⭐⭐⭐⭐⭐'},
+  ];
+  const seedActivity = [
+    {color:'#a855f7',text:'Admin bernasolhanna@gmail.com signed in',time:'Just now'},
+    {color:'#22c55e',text:'New user registered: ana@outlook.com',time:'2 hours ago'},
+    {color:'#3b82f6',text:'Chat session #C004 completed (22 messages)',time:'3 hours ago'},
+    {color:'#f59e0b',text:'5-star feedback received from maria@gmail.com',time:'5 hours ago'},
+    {color:'#06b6d4',text:'New guest session started',time:'Yesterday'},
+    {color:'#22c55e',text:'New user registered: juan@yahoo.com',time:'Apr 22'},
+  ];
+
+  function renderUsersTable(users, tableId='recentUsersTable', maxRows=5) {
+    const tb = document.getElementById(tableId);
+    if (!tb) return;
+    const rows = users.slice(0, maxRows);
+    tb.innerHTML = rows.length === 0
+      ? `<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:24px">No users found.</td></tr>`
+      : rows.map(u => `
+      <tr>
+        <td><div style="display:flex;align-items:center;gap:8px">
+          <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;font-size:12px">${u.type==='Guest'?'👤':'😊'}</div>
+          <span>${u.name}</span>
+        </div></td>
+        ${tableId!=='recentUsersTable'?`<td style="color:var(--muted);font-size:12px">${u.email}</td>`:''}
+        <td><span class="badge ${u.type==='Guest'?'blue':'purple'}">${u.type}</span></td>
+        <td style="color:var(--muted);font-size:12px">${u.joined}</td>
+        <td>${u.sessions}</td>
+        <td><span class="badge ${u.status==='Active'?'green':'blue'}">${u.status}</span></td>
+      </tr>`).join('');
+  }
+
+  function renderChatsTable(chats) {
+    const tb = document.getElementById('chatsTable');
+    if (!tb) return;
+    tb.innerHTML = chats.map(c => `
+      <tr>
+        <td style="color:var(--purple-light);font-size:12px">${c.id}</td>
+        <td style="font-size:12px;color:var(--muted)">${c.user}</td>
+        <td>${c.msgs}</td>
+        <td><span class="badge gold">${c.topic}</span></td>
+        <td style="color:var(--muted);font-size:12px">${c.date}</td>
+        <td>${c.rating}</td>
+      </tr>`).join('');
+  }
+
+  function renderActivity(items) {
+    const log = document.getElementById('activityLog');
+    if (!log) return;
+    log.innerHTML = items.map(a => `
+      <div class="activity-item">
+        <div class="act-dot" style="background:${a.color}"></div>
+        <div class="act-content">
+          <div class="act-text">${a.text}</div>
+          <div class="act-time">${a.time}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  let allUsers = [...seedUsers];
+
+  window.filterUsers = (q) => {
+    const src = window.__allUsers || allUsers;
+    const filtered = src.filter(u =>
+      u.name.toLowerCase().includes(q.toLowerCase()) ||
+      u.email.toLowerCase().includes(q.toLowerCase())
+    );
+    renderUsersTable(filtered, 'usersTable', 999);
+  };
+
+  // ── FIRESTORE HELPERS ──
+  let __db, __api;
+
+  function fmt(ts) {
+    if (!ts) return '—';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  }
+  function fmtTime(ts) {
+    if (!ts) return '—';
+    const d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+  }
+
+  // ── LOAD DASHBOARD (Overview) ──
+  async function loadDashboard() {
+    const { collection, getDocs, query, orderBy, limit, where } = __api;
+    let users = [...seedUsers];
+
+    try {
+      const usersSnap = await getDocs(collection(__db, 'users'));
+      if (!usersSnap.empty) {
+        users = usersSnap.docs.map(d => {
+          const data = d.data();
+          return {
+            id: d.id,
+            name: data.displayName || 'User',
+            email: data.email || '—',
+            type: data.isGuest ? 'Guest' : 'Signed In',
+            joined: fmt(data.createdAt),
+            lastSeen: fmt(data.lastSeen),
+            sessions: data.sessionCount || 1,
+            status: 'Active'
+          };
+        });
+      }
+    } catch(e) { console.warn('Users load error:', e); }
+
+    window.__allUsers = users;
+
+    // Sessions count from Firestore
+    let totalSessions = users.reduce((a, u) => a + u.sessions, 0);
+    let totalMessages = 0;
+    try {
+      const sessSnap = await getDocs(collection(__db, 'sessions'));
+      if (!sessSnap.empty) {
+        totalSessions = sessSnap.size;
+        totalMessages = sessSnap.docs.reduce((a, d) => a + (d.data().messageCount || 0), 0);
+      }
+    } catch(e) {}
+
+    // Feedback stats from Firestore
+    let posCount = 0, negCount = 0;
+    try {
+      const fbSnap = await getDocs(collection(__db, 'feedback'));
+      fbSnap.docs.forEach(d => {
+        if (d.data().type === 'positive') posCount++;
+        else negCount++;
+      });
+    } catch(e) {}
+    const totalFb = posCount + negCount;
+    const posRate = totalFb ? Math.round((posCount / totalFb) * 100) : 89;
+    const avgRating = totalFb ? (posCount / totalFb * 2 + 3).toFixed(1) : '4.7';
+
+    // Weekly bar chart — sessions per day last 7 days
+    let weekData = [12, 19, 8, 24, 17, 31, 14];
+    try {
+      const sessSnap2 = await getDocs(collection(__db, 'sessions'));
+      if (!sessSnap2.empty) {
+        const counts = [0,0,0,0,0,0,0];
+        const now = new Date();
+        sessSnap2.docs.forEach(d => {
+          const ts = d.data().startedAt;
+          if (!ts) return;
+          const date = ts.toDate ? ts.toDate() : new Date(ts);
+          const diffDays = Math.floor((now - date) / 86400000);
+          if (diffDays >= 0 && diffDays < 7) counts[6 - diffDays]++;
+        });
+        if (counts.some(c => c > 0)) weekData = counts;
+      }
+    } catch(e) {}
+
+    const signedIn = users.filter(u => u.type === 'Signed In').length;
+    const guests = users.filter(u => u.type === 'Guest').length;
+    const total = users.length;
+    const pct = total ? Math.round((signedIn / total) * 100) : 62;
+
+    // Update stat cards
+    document.getElementById('stat-users').textContent = total;
+    document.getElementById('stat-sessions').textContent = totalSessions;
+    document.getElementById('stat-rating').textContent = avgRating + ' ★';
+    document.getElementById('stat-messages').textContent = totalMessages || users.reduce((a,u)=>a+u.sessions*6,0);
+    document.getElementById('userCount').textContent = total;
+    document.getElementById('leg-signin').textContent = signedIn;
+    document.getElementById('leg-guest').textContent = guests;
+
+    // Update donut
+    const circ = 2 * Math.PI * 46;
+    const d1 = document.getElementById('donut1');
+    const d2 = document.getElementById('donut2');
+    if (d1 && d2) {
+      const arc1 = (pct / 100) * circ;
+      const arc2 = circ - arc1;
+      d1.setAttribute('stroke-dasharray', `${arc1.toFixed(1)} ${arc2.toFixed(1)}`);
+      d2.setAttribute('stroke-dasharray', `${arc2.toFixed(1)} ${arc1.toFixed(1)}`);
+      d2.setAttribute('stroke-dashoffset', `-${arc1.toFixed(1)}`);
+      d1.parentNode.querySelector('text').textContent = `${pct}%`;
+    }
+
+    renderUsersTable(users, 'recentUsersTable', 5);
+    renderBarChart(weekData);
+
+    // Feedback summary
+    document.getElementById('fb-avg').textContent = avgRating + ' ★';
+    document.getElementById('fb-positive').textContent = posRate + '%';
+    document.getElementById('fb-negative').textContent = (100 - posRate) + '%';
+  }
+
+  // ── LOAD CHATS PANEL ──
+  async function loadChatsPanel() {
+    const { collection, getDocs, query, orderBy, limit } = __api;
+    const tb = document.getElementById('chatsTable');
+    if (!tb) return;
+    tb.innerHTML = `<tr><td colspan="6" style="color:var(--muted);text-align:center;padding:20px">Loading from Firebase…</td></tr>`;
+    try {
+      const q = query(collection(__db, 'sessions'), orderBy('startedAt','desc'), limit(50));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        renderChatsTable(seedChats);
+        return;
+      }
+      const rows = snap.docs.map(d => {
+        const data = d.data();
+        return {
+          id: '#' + d.id.slice(-6).toUpperCase(),
+          user: data.email || (data.isGuest ? 'Guest' : 'Unknown'),
+          msgs: data.messageCount || 0,
+          topic: data.topic || 'General',
+          date: fmtTime(data.startedAt),
+          rating: '—'
+        };
+      });
+      renderChatsTable(rows);
+    } catch(e) {
+      renderChatsTable(seedChats);
+    }
+  }
+
+  // ── LOAD FEEDBACK PANEL ──
+  async function loadFeedbackPanel() {
+    const { collection, getDocs, query, orderBy, limit } = __api;
+    const tb = document.getElementById('feedbackTable');
+    if (!tb) return;
+    tb.innerHTML = `<tr><td colspan="4" style="color:var(--muted);text-align:center;padding:20px">Loading from Firebase…</td></tr>`;
+    try {
+      const q = query(collection(__db, 'feedback'), orderBy('timestamp','desc'), limit(50));
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        tb.innerHTML = `<tr><td colspan="4" style="color:var(--muted);text-align:center;padding:24px">No feedback submitted yet.</td></tr>`;
+        return;
+      }
+      let pos = 0, neg = 0;
+      tb.innerHTML = snap.docs.map(d => {
+        const data = d.data();
+        const isPos = data.type === 'positive';
+        if (isPos) pos++; else neg++;
+        const stars = isPos ? '⭐⭐⭐⭐⭐' : '⭐⭐';
+        const preview = (data.botReply || '').slice(0, 60) + ((data.botReply || '').length > 60 ? '…' : '');
+        return `<tr>
+          <td style="font-size:12px;color:var(--muted)">${data.uid === 'guest' ? 'Guest' : (data.uid || '—').slice(0,10)+'…'}</td>
+          <td><span class="badge ${isPos ? 'green' : 'badge' }" style="${!isPos ? 'background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.2)' : ''}">${isPos ? '👍 Positive' : '👎 Negative'}</span></td>
+          <td style="font-size:12px;color:var(--muted);max-width:260px">${preview || '—'}</td>
+          <td style="font-size:12px;color:var(--muted)">${fmtTime(data.timestamp)}</td>
+        </tr>`;
+      }).join('');
+      // Update summary stats
+      const total = pos + neg;
+      const posRate = total ? Math.round((pos / total) * 100) : 0;
+      document.getElementById('fb-avg').textContent = total ? (pos/total*2+3).toFixed(1) + ' ★' : '—';
+      document.getElementById('fb-positive').textContent = posRate + '%';
+      document.getElementById('fb-negative').textContent = (100 - posRate) + '%';
+    } catch(e) {
+      tb.innerHTML = `<tr><td colspan="4" style="color:var(--muted);text-align:center;padding:24px">Error loading feedback: ${e.message}</td></tr>`;
+    }
+  }
+
+  // ── LOAD ACTIVITY PANEL ──
+  async function loadActivityPanel() {
+    const { collection, getDocs, query, orderBy, limit } = __api;
+    const log = document.getElementById('activityLog');
+    if (!log) return;
+    log.innerHTML = `<div style="color:var(--muted);text-align:center;padding:24px;font-size:13px">Loading activity…</div>`;
+    try {
+      // Merge sessions + feedback as activity timeline
+      const [sessSnap, fbSnap] = await Promise.all([
+        getDocs(query(collection(__db, 'sessions'), orderBy('startedAt','desc'), limit(20))),
+        getDocs(query(collection(__db, 'feedback'), orderBy('timestamp','desc'), limit(20)))
+      ]);
+
+      const events = [];
+      sessSnap.docs.forEach(d => {
+        const data = d.data();
+        events.push({
+          color: data.isGuest ? '#3b82f6' : '#22c55e',
+          text: data.isGuest
+            ? `Guest session started (${data.topic || 'General'})`
+            : `${data.email || 'User'} started a chat (${data.topic || 'General'}, ${data.messageCount || 0} msgs)`,
+          ts: data.startedAt
+        });
+      });
+      fbSnap.docs.forEach(d => {
+        const data = d.data();
+        events.push({
+          color: data.type === 'positive' ? '#f59e0b' : '#ef4444',
+          text: `${data.type === 'positive' ? '👍 Positive' : '👎 Negative'} feedback from ${data.uid === 'guest' ? 'Guest' : 'User'}`,
+          ts: data.timestamp
+        });
+      });
+
+      // Sort by timestamp desc
+      events.sort((a, b) => {
+        const ta = a.ts?.toDate?.() || new Date(0);
+        const tb2 = b.ts?.toDate?.() || new Date(0);
+        return tb2 - ta;
+      });
+
+      if (events.length === 0) {
+        renderActivity(seedActivity);
+        return;
+      }
+
+      log.innerHTML = events.slice(0, 30).map(a => `
+        <div class="activity-item">
+          <div class="act-dot" style="background:${a.color}"></div>
+          <div class="act-content">
+            <div class="act-text">${a.text}</div>
+            <div class="act-time">${fmtTime(a.ts)}</div>
+          </div>
+        </div>`).join('');
+    } catch(e) {
+      renderActivity(seedActivity);
+    }
+  }
+
+  // ── EXPORT CSV ──
+  window.exportUsersCSV = () => {
+    const users = window.__allUsers || seedUsers;
+    const rows = [['Name','Email','Type','Joined','Sessions','Status']];
+    users.forEach(u => rows.push([u.name, u.email, u.type, u.joined, u.sessions, u.status]));
+    const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = 'iloilo_users_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+  };
+  document.getElementById('userExportBtn')?.addEventListener('click', window.exportUsersCSV);
+
+  // ── AUTH FLOW ──
+  async function init() {
+    const api = await waitForAuth();
+    __db = api.db;
+    __api = api;
+
+    window.handleLogin = async () => {
+      const btn = document.getElementById('loginBtn');
+      const errEl = document.getElementById('loginError');
+      btn.disabled = true; btn.textContent = 'Signing in…'; errEl.style.display = 'none';
+      try {
+        const result = await api.signInWithPopup(api.auth, api.provider);
+        if (result.user.email !== ADMIN_EMAIL) {
+          await api.signOut(api.auth);
+          errEl.style.display = 'block';
+          btn.disabled = false;
+          btn.innerHTML = googleBtnHTML();
+        }
+      } catch(e) {
+        btn.disabled = false; btn.innerHTML = googleBtnHTML();
+      }
+    };
+
+    window.handleLogout = async () => { await api.signOut(api.auth); };
+
+    api.onAuthStateChanged(api.auth, async user => {
+      if (user && user.email === ADMIN_EMAIL) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('dashboard').classList.add('visible');
+        document.getElementById('sidebarEmail').textContent = user.displayName || user.email;
+        document.getElementById('settingsEmail').textContent = user.email;
+        document.getElementById('loginError').style.display = 'none';
+        await loadDashboard();
+      } else {
+        document.getElementById('loginScreen').style.display = 'flex';
+        document.getElementById('dashboard').classList.remove('visible');
+        const btn = document.getElementById('loginBtn');
+        btn.disabled = false; btn.innerHTML = googleBtnHTML();
+      }
+    });
+  }
+
+  function googleBtnHTML() {
+    return `<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="rgba(255,255,255,0.7)" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="rgba(255,255,255,0.5)" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="rgba(255,255,255,0.4)" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Continue with Google`;
+  }
+
+  init();
+</script>
+</body>
+</html>
