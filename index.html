@@ -215,7 +215,6 @@
   .chat-orb-small { width: 38px; height: 38px; border-radius: 50%; background: conic-gradient(from 0deg, #3b82f6, #7c3aed, #ec4899, #a855f7, #06b6d4, #3b82f6); box-shadow: 0 0 16px rgba(124,58,237,0.6); position: relative; overflow: hidden; flex-shrink: 0; animation: orb-swirl 8s linear infinite; }
   .chat-orb-small::after { content:''; position:absolute; inset:0; border-radius:50%; background:repeating-conic-gradient(rgba(255,255,255,0.06) 0deg 10deg, transparent 10deg 20deg); animation:orb-swirl 8s linear infinite; }
 
-  /* ── ADD KB BUTTON in chat header ── */
   .add-kb-btn {
     width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0;
     background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.08));
@@ -276,12 +275,7 @@
   .kb-view-title { font-family: var(--font-display); font-size: 17px; font-weight: 800; flex: 1; }
   #kbViewList { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
   #kbViewList::-webkit-scrollbar { display: none; }
-  .kb-entry {
-    padding: 14px 16px; border-radius: 16px;
-    border: 1px solid rgba(245,158,11,0.2);
-    background: rgba(245,158,11,0.04);
-    position: relative; transition: border-color .18s;
-  }
+  .kb-entry { padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(245,158,11,0.2); background: rgba(245,158,11,0.04); position: relative; transition: border-color .18s; }
   .kb-entry:hover { border-color: rgba(245,158,11,0.4); }
   .kb-entry-topic { font-size: 10px; text-transform: uppercase; letter-spacing: .7px; color: var(--gold); font-weight: 700; margin-bottom: 5px; }
   .kb-entry-q { font-size: 13px; color: var(--text); font-weight: 600; margin-bottom: 4px; }
@@ -294,58 +288,22 @@
   .kb-add-btn:hover { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.6); }
 
   /* ── ADD KB MODAL ── */
-  #kbModal {
-    position: fixed; top: 50%; left: 50%;
-    transform: translate(-50%, -50%) scale(.88);
-    width: min(420px, 94vw);
-    background: rgba(12,10,22,0.99);
-    border-radius: 24px;
-    border: 1px solid rgba(245,158,11,0.2);
-    box-shadow: 0 24px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(245,158,11,0.08);
-    z-index: 201;
-    opacity: 0; pointer-events: none;
-    transition: all .28s cubic-bezier(.34,1.56,.64,1);
-    overflow: hidden;
-  }
+  #kbModal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(.88); width: min(420px, 94vw); background: rgba(12,10,22,0.99); border-radius: 24px; border: 1px solid rgba(245,158,11,0.2); box-shadow: 0 24px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(245,158,11,0.08); z-index: 201; opacity: 0; pointer-events: none; transition: all .28s cubic-bezier(.34,1.56,.64,1); overflow: hidden; }
   #kbModal.open { opacity: 1; pointer-events: all; transform: translate(-50%, -50%) scale(1); }
-
-  .kb-modal-header {
-    padding: 22px 22px 16px;
-    background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(124,58,237,0.12));
-    border-bottom: 1px solid rgba(245,158,11,0.15);
-    display: flex; align-items: flex-start; justify-content: space-between;
-  }
+  .kb-modal-header { padding: 22px 22px 16px; background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(124,58,237,0.12)); border-bottom: 1px solid rgba(245,158,11,0.15); display: flex; align-items: flex-start; justify-content: space-between; }
   .kb-modal-header h2 { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--text); }
   .kb-modal-header p { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
   .kb-modal-close { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; width: 30px; height: 30px; color: var(--muted); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
   .kb-modal-close:hover { background: rgba(255,255,255,0.14); color: var(--text); }
-
   .kb-modal-body { padding: 18px 20px 6px; display: flex; flex-direction: column; gap: 13px; }
-
   .kb-field { display: flex; flex-direction: column; gap: 5px; }
   .kb-field label { font-size: 10.5px; font-weight: 600; color: rgba(245,158,11,0.8); text-transform: uppercase; letter-spacing: .6px; }
-  .kb-field input,
-  .kb-field textarea,
-  .kb-field select {
-    padding: 11px 13px;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 11px;
-    font-family: var(--font-body);
-    font-size: 13.5px;
-    color: var(--text);
-    background: rgba(255,255,255,0.04);
-    outline: none;
-    transition: border-color .2s, background .2s;
-  }
-  .kb-field input:focus,
-  .kb-field textarea:focus,
-  .kb-field select:focus { border-color: rgba(245,158,11,0.45); background: rgba(255,255,255,0.07); }
-  .kb-field input::placeholder,
-  .kb-field textarea::placeholder { color: var(--muted); }
+  .kb-field input, .kb-field textarea, .kb-field select { padding: 11px 13px; border: 1px solid rgba(255,255,255,0.08); border-radius: 11px; font-family: var(--font-body); font-size: 13.5px; color: var(--text); background: rgba(255,255,255,0.04); outline: none; transition: border-color .2s, background .2s; }
+  .kb-field input:focus, .kb-field textarea:focus, .kb-field select:focus { border-color: rgba(245,158,11,0.45); background: rgba(255,255,255,0.07); }
+  .kb-field input::placeholder, .kb-field textarea::placeholder { color: var(--muted); }
   .kb-field textarea { min-height: 90px; line-height: 1.55; resize: vertical; }
   .kb-field select option { background: #1a1530; color: var(--text); }
   .kb-hint { font-size: 11px; color: var(--muted); }
-
   .kb-modal-footer { padding: 14px 20px 20px; display: flex; gap: 10px; justify-content: flex-end; }
   .kb-btn-cancel { padding: 10px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: none; color: var(--muted); font-family: var(--font-body); font-size: 13px; cursor: pointer; transition: all .18s; }
   .kb-btn-cancel:hover { background: var(--surface2); color: var(--text); }
@@ -492,7 +450,6 @@
         <div class="chat-title">Iloilo AI Guide</div>
         <div class="chat-sub" id="chatSubtitle">Powered by Llama 3.3 70B · Online</div>
       </div>
-      <!-- ✦ PLUS BUTTON -->
       <button class="add-kb-btn" id="addKbBtn" title="Add knowledge to the AI">＋</button>
       <div class="chat-orb-small"></div>
     </div>
@@ -591,7 +548,7 @@
     </div>
     <div class="kb-field">
       <label>Answer / Knowledge</label>
-      <textarea id="kbAnswer" placeholder="e.g. The Dinagyang Festival is held every 4th Sunday of January in Iloilo City. It celebrates the arrival of the Santo Niño and the Ati people. Known for colorful costumes, drumbeating, and street dancing competitions."></textarea>
+      <textarea id="kbAnswer" placeholder="e.g. The Dinagyang Festival is held every 4th Sunday of January in Iloilo City..."></textarea>
       <span class="kb-hint">💡 The knowledge the AI will use when answering</span>
     </div>
     <div class="kb-field">
@@ -609,20 +566,15 @@
   </div>
   <div class="kb-modal-footer">
     <button class="kb-btn-cancel" onclick="closeKbModal()">Cancel</button>
-    <button class="kb-btn-save" id="kbSaveBtn" onclick="saveKbEntry()">
-      💾 Save to Firebase
-    </button>
+    <button class="kb-btn-save" id="kbSaveBtn" onclick="saveKbEntry()">💾 Save to Firebase</button>
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-  /* ══ GROQ CONFIG ══ */
-  const GROQ_KEY   = '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';
+  /* ══ CONFIG — no API key here, handled server-side via /api/chat ══ */
   const GROQ_MODEL = 'llama-3.3-70b-versatile';
-  const GROQ_URL   = 'https://api.groq.com/openai/v1/chat/completions';
 
   const BASE_SYSTEM = 'You are a friendly and knowledgeable AI travel guide for Iloilo City, Philippines. You speak warmly and helpfully, sometimes using Ilonggo greetings like "Maayong aga" or "Kamusta". Keep answers concise and practical. Focus on tourist spots, food, hotels, transport, and local events in Iloilo.';
 
@@ -632,7 +584,7 @@
   let currentSessionId = null;
   let currentChatMessages = [{ role: 'system', content: BASE_SYSTEM }];
   let lastBotReply = null;
-  let dynamicKB = []; // loaded from Firebase knowledgeBase collection
+  let dynamicKB = [];
 
   /* ══ VIEW MANAGEMENT ══ */
   function showView(id) {
@@ -704,7 +656,7 @@
     document.getElementById('chatSubtitle').textContent = user ? `Signed in as ${user.displayName || user.email} · Online` : 'Browsing as Guest · Online';
   }
 
-  /* ══ FIREBASE: HELPERS ══ */
+  /* ══ FIREBASE HELPERS ══ */
   async function saveUserToFirestore(user) {
     const fb = window.__fb; if (!fb || !user) return;
     try {
@@ -794,7 +746,6 @@
     });
   }
 
-  /* KB VIEW */
   async function loadKbView() {
     await loadKbFromFirebase();
     renderKbView();
@@ -828,7 +779,6 @@
     } catch(e) { showToast('❌ Delete failed: ' + e.message, 'error'); }
   }
 
-  /* KB MODAL */
   function openKbModal() {
     document.getElementById('kbModal').classList.add('open');
     document.getElementById('modalBg').classList.add('open');
@@ -878,7 +828,7 @@
     }
   }
 
-  /* ══ CHAT ══ */
+  /* ══ CHAT — calls /api/chat proxy, no key in frontend ══ */
   function goChat(prefill) {
     if (prefill && typeof prefill === 'string') document.getElementById('chatInput').value = prefill;
     showView('chat');
@@ -906,7 +856,6 @@
     if (t.includes('spot') || t.includes('tour') || t.includes('visit') || t.includes('place') || t.includes('church')) return 'Tourist Spots';
     if (t.includes('transport') || t.includes('bus') || t.includes('jeep') || t.includes('taxi') || t.includes('ride')) return 'Transport';
     if (t.includes('event') || t.includes('festival') || t.includes('dinagyang') || t.includes('happening')) return 'Events';
-    // Check against dynamic KB topics
     for (const k of dynamicKB) {
       if (t.includes(k.topic.toLowerCase())) return k.category?.replace('_',' ') || 'General';
     }
@@ -924,14 +873,12 @@
     const topic = detectTopic(text);
     appendMsg('user', text);
 
-    // RAG: inject dynamic KB context into system prompt
     const kbCtx = retrieveKbContext(text);
     const systemWithKb = BASE_SYSTEM + kbCtx;
 
-    // Build messages with updated system
     const msgsToSend = [
       { role: 'system', content: systemWithKb },
-      ...currentChatMessages.slice(1), // skip old system
+      ...currentChatMessages.slice(1),
       { role: 'user', content: text }
     ];
     currentChatMessages.push({ role: 'user', content: text });
@@ -941,10 +888,11 @@
     document.getElementById('feedbackBar').style.display = 'none';
 
     try {
-      const res = await fetch(GROQ_URL, {
+      /* Key lives in Vercel env — never exposed to the browser */
+      const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Authorization': `Bearer ${GROQ_KEY}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: GROQ_MODEL, messages: msgsToSend, temperature: 0.72, max_tokens: 900 })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: msgsToSend })
       });
       if (!res.ok) throw new Error('API ' + res.status);
       const data = await res.json();
