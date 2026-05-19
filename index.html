@@ -63,7 +63,6 @@
     --card-radius: 20px;
     --font-display: 'Syne', sans-serif;
     --font-body: 'DM Sans', sans-serif;
-    /* Responsive max-width for app shell */
     --app-max: 480px;
   }
 
@@ -71,7 +70,6 @@
   body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; -webkit-tap-highlight-color: transparent; scrollbar-width: none; }
   body::-webkit-scrollbar { display: none; }
 
-  /* ── BACKGROUND ── */
   .bg-canvas { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
   .bg-canvas::before {
     content: ''; position: absolute; inset: 0;
@@ -87,41 +85,33 @@
     mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
   }
 
-  /* ── APP SHELL (responsive) ── */
   .app-shell {
     position: relative; z-index: 1;
     height: 100vh; height: 100dvh;
     display: flex; flex-direction: column;
     max-width: var(--app-max);
     margin: 0 auto;
-    /* On wide screens, add subtle side borders */
     box-shadow: 0 0 0 1px rgba(255,255,255,0.04);
   }
 
   .view { display: none; flex-direction: column; height: 100%; overflow: hidden; }
   .view.active { display: flex; }
 
-  /* ════════════════════════════════
-     LANDING
-  ════════════════════════════════ */
+  /* ════ LANDING ════ */
   #landing {
-    overflow-y: auto;
-    scrollbar-width: none;
-    align-items: center;
-    justify-content: space-between;
-    padding: clamp(32px, 6vw, 60px) clamp(20px, 6vw, 28px) clamp(24px, 5vw, 40px);
-    text-align: center;
-    gap: 24px;
+    overflow-y: auto; scrollbar-width: none;
+    align-items: center; justify-content: space-between;
+    padding: clamp(32px,6vw,60px) clamp(20px,6vw,28px) clamp(24px,5vw,40px);
+    text-align: center; gap: 24px;
   }
   #landing::-webkit-scrollbar { display: none; }
 
   .brand-tag {
-    font-family: var(--font-display); font-size: clamp(9px, 2.5vw, 11px);
+    font-family: var(--font-display); font-size: clamp(9px,2.5vw,11px);
     font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
     color: var(--purple-light);
     background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.25);
-    padding: 6px 16px; border-radius: 100px;
-    white-space: nowrap;
+    padding: 6px 16px; border-radius: 100px; white-space: nowrap;
   }
 
   .orb-wrapper { position: relative; width: clamp(160px,45vw,220px); height: clamp(160px,45vw,220px); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -174,9 +164,7 @@
   .btn-modal-cancel:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
   .modal-error { margin-top: 12px; font-size: 12px; color: #ef4444; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 10px 14px; display: none; }
 
-  /* ════════════════════════════════
-     HOME
-  ════════════════════════════════ */
+  /* ════ HOME ════ */
   #home { padding: 0; }
   .home-header { display: flex; align-items: center; justify-content: space-between; padding: clamp(14px,4vw,20px) clamp(16px,5vw,24px) 12px; flex-shrink: 0; }
   .menu-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; touch-action: manipulation; }
@@ -253,9 +241,7 @@
   .nav-orb-btn:hover, .nav-orb-btn:active { transform: scale(1.1) translateY(-2px); }
   .nav-orb-inner { font-size: 20px; z-index: 1; position: relative; }
 
-  /* ════════════════════════════════
-     CHAT
-  ════════════════════════════════ */
+  /* ════ CHAT ════ */
   #chat { padding: 0; }
   .chat-header { display: flex; align-items: center; gap: 10px; padding: clamp(14px,4vw,20px) clamp(14px,4vw,20px) 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
   .back-btn { width: 34px; height: 34px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: all 0.2s; flex-shrink: 0; touch-action: manipulation; }
@@ -298,7 +284,6 @@
   .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
   @keyframes typing { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-6px);opacity:1} }
 
-  /* RAG badge shown in bot responses */
   .rag-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 2px 8px; border-radius: 100px; margin-top: 6px; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.25); color: #86efac; vertical-align: middle; }
 
   .chat-input-area { padding: 10px clamp(12px,4vw,16px) env(safe-area-inset-bottom, 16px); border-top: 1px solid var(--border); background: rgba(7,6,15,0.95); backdrop-filter: blur(20px); flex-shrink: 0; }
@@ -316,9 +301,7 @@
   .fb-btn.active-pos { border-color: #22c55e; color: #22c55e; background: rgba(34,197,94,0.1); }
   .fb-btn.active-neg { border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,0.1); }
 
-  /* ════════════════════════════════
-     HISTORY VIEW
-  ════════════════════════════════ */
+  /* ════ HISTORY VIEW ════ */
   #history { padding: 0; }
   .history-header { display: flex; align-items: center; gap: 12px; padding: clamp(14px,4vw,20px) clamp(14px,4vw,20px) 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
   .history-title { font-family: var(--font-display); font-size: clamp(15px,4vw,17px); font-weight: 800; flex: 1; }
@@ -328,20 +311,26 @@
   .empty-state div { font-size: 36px; margin-bottom: 12px; }
   .empty-state p { font-size: clamp(12px,3vw,14px); line-height: 1.5; }
 
-  /* ════════════════════════════════
-     KB VIEW
-  ════════════════════════════════ */
+  /* ════ KB VIEW ════ */
   #kbView { padding: 0; }
   .kb-view-header { display: flex; align-items: center; gap: 12px; padding: clamp(14px,4vw,20px) clamp(14px,4vw,20px) 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
   .kb-view-title { font-family: var(--font-display); font-size: clamp(15px,4vw,17px); font-weight: 800; flex: 1; }
   #kbViewList { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
   #kbViewList::-webkit-scrollbar { display: none; }
+
+  /* ── KB filter tabs ── */
+  .kb-filter-row { display: flex; gap: 6px; padding: 6px 14px 0; overflow-x: auto; scrollbar-width: none; flex-shrink: 0; }
+  .kb-filter-row::-webkit-scrollbar { display: none; }
+  .kb-filter-tab { flex-shrink: 0; padding: 5px 11px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 11px; font-weight: 500; cursor: pointer; transition: all .18s; touch-action: manipulation; white-space: nowrap; }
+  .kb-filter-tab.active { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.1); color: var(--gold); }
+
   .kb-entry { padding: 13px 15px; border-radius: 16px; border: 1px solid rgba(245,158,11,0.2); background: rgba(245,158,11,0.04); position: relative; transition: border-color .18s; padding-right: 70px; }
   .kb-entry:hover { border-color: rgba(245,158,11,0.4); }
   .kb-entry-topic { font-size: 10px; text-transform: uppercase; letter-spacing: .7px; color: var(--gold); font-weight: 700; margin-bottom: 5px; }
   .kb-entry-q { font-size: clamp(12px,3vw,13px); color: var(--text); font-weight: 600; margin-bottom: 4px; }
   .kb-entry-a { font-size: clamp(11px,2.5vw,12px); color: var(--muted); line-height: 1.5; }
   .kb-entry-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 3px 9px; border-radius: 100px; margin-top: 8px; background: rgba(124,58,237,0.15); border: 1px solid rgba(168,85,247,0.2); color: var(--purple-light); }
+  .kb-entry-coll { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 3px 9px; border-radius: 100px; margin-top: 8px; margin-left: 4px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); color: var(--gold); }
   .kb-entry-del { position: absolute; top: 10px; right: 10px; background: none; border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; color: rgba(239,68,68,0.6); font-size: 12px; padding: 4px 8px; cursor: pointer; transition: all .15s; white-space: nowrap; touch-action: manipulation; }
   .kb-entry-del:hover, .kb-entry-del:active { background: rgba(239,68,68,0.12); color: #ef4444; border-color: rgba(239,68,68,0.5); }
 
@@ -349,18 +338,12 @@
   .kb-add-btn { width: 100%; padding: 12px; border-radius: 13px; border: 1px dashed rgba(245,158,11,0.4); background: rgba(245,158,11,0.04); color: var(--gold); font-family: var(--font-display); font-size: clamp(12px,3vw,13px); font-weight: 700; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px; touch-action: manipulation; }
   .kb-add-btn:hover, .kb-add-btn:active { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.6); }
 
-  /* ════════════════════════════════
-     ADD KB MODAL
-  ════════════════════════════════ */
+  /* ════ ADD KB MODAL ════ */
   #kbModal {
-    position: fixed;
-    top: 50%; left: 50%;
+    position: fixed; top: 50%; left: 50%;
     transform: translate(-50%, -50%) scale(.88);
-    width: min(460px, 96vw);
-    max-height: 90vh;
-    overflow-y: auto;
-    background: rgba(12,10,22,0.99);
-    border-radius: 24px;
+    width: min(460px, 96vw); max-height: 90vh; overflow-y: auto;
+    background: rgba(12,10,22,0.99); border-radius: 24px;
     border: 1px solid rgba(245,158,11,0.2);
     box-shadow: 0 24px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(245,158,11,0.08);
     z-index: 201; opacity: 0; pointer-events: none;
@@ -391,6 +374,9 @@
   .kb-field select option { background: #1a1530; color: var(--text); }
   .kb-hint { font-size: 11px; color: var(--muted); }
 
+  /* Collection preview badge inside modal */
+  .coll-preview { display: inline-flex; align-items: center; gap: 5px; margin-top: 4px; padding: 4px 10px; border-radius: 8px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); font-size: 11px; color: var(--gold); }
+
   .kb-modal-footer { padding: 12px 18px 18px; display: flex; gap: 10px; justify-content: flex-end; position: sticky; bottom: 0; background: rgba(12,10,22,0.95); border-top: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px); }
   .kb-btn-cancel { padding: 10px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: none; color: var(--muted); font-family: var(--font-body); font-size: 13px; cursor: pointer; transition: all .18s; touch-action: manipulation; }
   .kb-btn-cancel:hover, .kb-btn-cancel:active { background: var(--surface2); color: var(--text); }
@@ -416,25 +402,17 @@
   .menu-item.gold-item:hover, .menu-item.gold-item:active { background: rgba(245,158,11,0.1); color: var(--gold); }
   .menu-icon { font-size: 18px; }
 
-  /* ── MODAL BG ── */
   #modalBg { display: none; position: fixed; inset: 0; background: rgba(7,6,15,0.85); backdrop-filter: blur(10px); z-index: 200; }
   #modalBg.open { display: block; }
 
-  /* ── ANIMATIONS ── */
   .fade-up { opacity: 0; transform: translateY(20px); animation: fade-up 0.6s ease forwards; }
   @keyframes fade-up { to{opacity:1;transform:translateY(0)} }
 
-  /* ── TOAST ── */
-  .toast { position: fixed; bottom: env(safe-area-inset-bottom, 100px); bottom: calc(env(safe-area-inset-bottom, 0px) + 90px); left: 50%; transform: translateX(-50%) translateY(10px); background: rgba(30,20,50,0.97); border: 1px solid var(--border); border-radius: 12px; padding: 10px 18px; font-size: clamp(11px,3vw,13px); color: var(--text); backdrop-filter: blur(16px); z-index: 300; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; }
+  .toast { position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 90px); left: 50%; transform: translateX(-50%) translateY(10px); background: rgba(30,20,50,0.97); border: 1px solid var(--border); border-radius: 12px; padding: 10px 18px; font-size: clamp(11px,3vw,13px); color: var(--text); backdrop-filter: blur(16px); z-index: 300; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.success { border-color: rgba(34,197,94,0.3); background: rgba(15,40,20,0.97); }
   .toast.error   { border-color: rgba(239,68,68,0.3); background: rgba(40,10,10,0.97); }
 
-  /* ── NLP CONFIDENCE INDICATOR ── */
-  .nlp-hint { font-size: 10px; color: var(--muted); text-align: center; padding: 4px 0 8px; display: none; }
-  .nlp-hint.show { display: block; }
-
-  /* Wide screen — center everything */
   @media (min-width: 520px) {
     .bg-canvas::before {
       background:
@@ -442,8 +420,6 @@
         radial-gradient(ellipse 35% 50% at 70% 70%, rgba(59,130,246,0.1) 0%, transparent 70%);
     }
   }
-
-  /* Ensure inputs don't zoom on iOS */
   @media (max-width: 480px) {
     input, textarea, select { font-size: 16px !important; }
   }
@@ -455,7 +431,7 @@
 
 <div class="app-shell">
 
-<!-- ════════ LANDING ════════ -->
+<!-- ════ LANDING ════ -->
 <div class="view active" id="landing">
   <div class="brand-tag fade-up" style="animation-delay:0.1s">🌺 Iloilo AI Travel Guide</div>
   <div class="orb-wrapper fade-up" style="animation-delay:0.3s">
@@ -474,7 +450,7 @@
   </div>
 </div>
 
-<!-- ════════ GOOGLE SIGN IN MODAL ════════ -->
+<!-- ════ GOOGLE SIGN IN MODAL ════ -->
 <div class="modal-overlay" id="signInModal">
   <div class="modal-card">
     <div class="modal-orb"></div>
@@ -489,7 +465,7 @@
   </div>
 </div>
 
-<!-- ════════ HOME ════════ -->
+<!-- ════ HOME ════ -->
 <div class="view" id="home">
   <div class="home-header">
     <div class="menu-btn" onclick="openMenu()"><span></span><span></span><span></span></div>
@@ -546,7 +522,7 @@
   </div>
 </div>
 
-<!-- ════════ CHAT VIEW ════════ -->
+<!-- ════ CHAT VIEW ════ -->
 <div class="view" id="chat">
   <div class="chat-header">
     <div class="back-btn" onclick="showView('home')">←</div>
@@ -576,7 +552,7 @@
   </div>
 </div>
 
-<!-- ════════ HISTORY VIEW ════════ -->
+<!-- ════ HISTORY VIEW ════ -->
 <div class="view" id="history">
   <div class="history-header">
     <div class="back-btn" onclick="showView('home')">←</div>
@@ -587,7 +563,7 @@
   </div>
 </div>
 
-<!-- ════════ KB VIEW ════════ -->
+<!-- ════ KB VIEW ════ -->
 <div class="view" id="kbView">
   <div class="kb-view-header">
     <div class="back-btn" onclick="showView('home')">←</div>
@@ -596,12 +572,23 @@
   <div class="kb-add-btn-row">
     <button class="kb-add-btn" onclick="openKbModal()">＋ Add New Knowledge Entry</button>
   </div>
+  <!-- Category filter tabs -->
+  <div class="kb-filter-row" id="kbFilterRow">
+    <div class="kb-filter-tab active" data-cat="all" onclick="filterKbView('all')">🗺️ All</div>
+    <div class="kb-filter-tab" data-cat="tourist_spots" onclick="filterKbView('tourist_spots')">🏛️ Spots</div>
+    <div class="kb-filter-tab" data-cat="food" onclick="filterKbView('food')">🍜 Food</div>
+    <div class="kb-filter-tab" data-cat="hotels" onclick="filterKbView('hotels')">🏨 Hotels</div>
+    <div class="kb-filter-tab" data-cat="transport" onclick="filterKbView('transport')">🚌 Transport</div>
+    <div class="kb-filter-tab" data-cat="events" onclick="filterKbView('events')">🎉 Events</div>
+    <div class="kb-filter-tab" data-cat="history" onclick="filterKbView('history')">📜 History</div>
+    <div class="kb-filter-tab" data-cat="general" onclick="filterKbView('general')">💬 General</div>
+  </div>
   <div id="kbViewList">
     <div class="empty-state"><div>📚</div><p>No custom entries yet.<br>Tap ＋ to add your first one!</p></div>
   </div>
 </div>
 
-<!-- ════════ MENU OVERLAY ════════ -->
+<!-- ════ MENU OVERLAY ════ -->
 <div class="overlay" id="menuOverlay" onclick="closeMenu(event)">
   <div class="menu-panel">
     <div class="menu-profile">
@@ -624,7 +611,7 @@
   </div>
 </div>
 
-<!-- ════════ ADD KB MODAL ════════ -->
+<!-- ════ ADD KB MODAL ════ -->
 <div id="modalBg"></div>
 <div id="kbModal">
   <div class="kb-modal-header">
@@ -657,7 +644,7 @@
     </div>
     <div class="kb-field">
       <label>Category</label>
-      <select id="kbCategory">
+      <select id="kbCategory" onchange="updateCollPreview()">
         <option value="tourist_spots">🏛️ Tourist Spots</option>
         <option value="food">🍜 Food & Restaurants</option>
         <option value="hotels">🏨 Hotels & Accommodation</option>
@@ -666,6 +653,10 @@
         <option value="history">📜 History & Culture</option>
         <option value="general">🗺️ General Iloilo</option>
       </select>
+      <!-- Shows which Firestore collection will be used -->
+      <div class="coll-preview" id="collPreview">
+        📂 Saves to Firestore collection: <strong id="collPreviewName">touristSpots</strong>
+      </div>
     </div>
   </div>
   <div class="kb-modal-footer">
@@ -686,6 +677,24 @@
 ══════════════════════════════════════ */
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
+// ── CATEGORY → FIRESTORE COLLECTION MAPPING ──
+// Each category maps to its own Firestore collection.
+// This mirrors the structure already in your Firestore
+// (touristSpots, food, hotels, transport, events, etc.)
+const CATEGORY_COLLECTIONS = {
+  tourist_spots: 'touristSpots',
+  food:          'food',
+  hotels:        'hotels',
+  transport:     'transport',
+  events:        'events',
+  history:       'history',
+  general:       'generalInfo'
+};
+
+// knowledgeBase is kept as a SHARED fallback collection for entries
+// that don't fit a specific category (backward compat).
+const FALLBACK_COLLECTION = 'knowledgeBase';
+
 const BASE_SYSTEM = `You are a friendly and knowledgeable AI travel guide for Iloilo City, Philippines. You speak warmly and helpfully, sometimes using Ilonggo greetings like "Maayong aga" or "Kamusta". Keep answers concise and practical. Focus on tourist spots, food, hotels, transport, and local events in Iloilo.
 
 CRITICAL ANTI-HALLUCINATION RULES:
@@ -698,12 +707,13 @@ CRITICAL ANTI-HALLUCINATION RULES:
 /* ══════════════════════════════════════
    STATE
 ══════════════════════════════════════ */
-let currentUser   = null;
-let isGuest       = false;
+let currentUser      = null;
+let isGuest          = false;
 let currentSessionId = null;
 let currentChatMessages = [{ role: 'system', content: BASE_SYSTEM }];
-let lastBotReply  = null;
-let dynamicKB     = [];   // Shared KB from Firestore — ALWAYS reloaded fresh
+let lastBotReply     = null;
+let dynamicKB        = [];   // All KB entries merged from all collections
+let kbFilterActive   = 'all'; // Current KB view filter
 
 /* ══════════════════════════════════════
    VIEW MANAGEMENT
@@ -714,6 +724,15 @@ function showView(id) {
   if (id === 'history') loadHistory();
   if (id === 'home')    loadRecentChatsOnHome();
   if (id === 'kbView')  loadKbView();
+}
+
+/* ══════════════════════════════════════
+   COLLECTION PREVIEW (in modal)
+══════════════════════════════════════ */
+function updateCollPreview() {
+  const cat = document.getElementById('kbCategory').value;
+  const coll = CATEGORY_COLLECTIONS[cat] || FALLBACK_COLLECTION;
+  document.getElementById('collPreviewName').textContent = coll;
 }
 
 /* ══════════════════════════════════════
@@ -749,9 +768,9 @@ async function handleSignOut() {
 
 function startAsGuest() {
   isGuest = true; currentUser = null;
-  currentSessionId = null; // FIX: Guests get NO persistent session — no chatHistory saved
+  currentSessionId = null;
   updateUIForUser(null);
-  loadKbFromFirebase(); // Always load shared KB
+  loadKbFromFirebase();
   showView('home');
 }
 
@@ -760,7 +779,7 @@ async function onUserSignedIn(user) {
   updateUIForUser(user);
   await saveUserToFirestore(user);
   await createSession(user);
-  loadKbFromFirebase(); // Always load shared KB
+  loadKbFromFirebase();
   showView('home');
   showToast('Welcome, ' + (user.displayName || 'traveler') + '! 🌺', 'success');
 }
@@ -805,7 +824,7 @@ async function saveUserToFirestore(user) {
 }
 
 async function createSession(user) {
-  const fb = window.__fb; if (!fb || !user) return; // FIX: Only create sessions for logged-in users
+  const fb = window.__fb; if (!fb || !user) return;
   try {
     const ref = await fb.addDoc(fb.collection(fb.db, 'sessions'), {
       uid: user.uid, displayName: user.displayName || '',
@@ -816,10 +835,9 @@ async function createSession(user) {
   } catch(e) { console.warn('Session error:', e); }
 }
 
-// FIX: Only save chat messages for LOGGED-IN users. Guests get no persistent history.
 async function saveChatMessage(role, content, topic) {
   const fb = window.__fb;
-  if (!fb || !currentUser || !currentSessionId) return; // GUEST CHECK — skip if guest
+  if (!fb || !currentUser || !currentSessionId) return;
   try {
     await fb.addDoc(fb.collection(fb.db, 'chatHistory'), {
       sessionId: currentSessionId, uid: currentUser.uid,
@@ -847,27 +865,23 @@ async function submitFeedback(type) {
 }
 
 /* ══════════════════════════════════════
-   NLP UTILITIES (for better RAG matching)
+   NLP UTILITIES
 ══════════════════════════════════════ */
-
-// Tokenise to meaningful words (remove stop words)
 const STOP_WORDS = new Set(['the','a','an','is','are','was','were','what','who','where','when','how','why','i','my','in','on','at','to','for','of','and','or','but','about','tell','me','can','do','does','please','know','find','get','show','give','want','need','have','has','it','its','this','that','there','their','here','yes','no','not','best','good','great']);
 
 function tokenise(text) {
   return text.toLowerCase()
     .replace(/[^\w\s]/g, ' ')
     .split(/\s+/)
-    .filter(w => w.length > 1 && !STOP_WORDS.has(w)); // Allow 2+ char words (covers "sa", etc.)
+    .filter(w => w.length > 1 && !STOP_WORDS.has(w));
 }
 
-// Compute token overlap score (Jaccard-like)
 function tokenScore(queryTokens, candidateText) {
   if (!candidateText) return 0;
   const candTokens = new Set(tokenise(candidateText));
   let hits = 0;
   for (const t of queryTokens) {
     if (candTokens.has(t)) hits++;
-    // Partial / substring match
     else for (const c of candTokens) {
       if (c.includes(t) || t.includes(c)) { hits += 0.6; break; }
     }
@@ -875,11 +889,10 @@ function tokenScore(queryTokens, candidateText) {
   return hits;
 }
 
-// Full NLP+RAG retrieval with exact-match guarantee
 function retrieveKbContext(userQuery) {
   if (!dynamicKB.length) return { context: '', hits: [] };
 
-  const queryLower = userQuery.toLowerCase();
+  const queryLower  = userQuery.toLowerCase();
   const queryTokens = tokenise(userQuery);
 
   const scored = dynamicKB.map(k => {
@@ -887,24 +900,20 @@ function retrieveKbContext(userQuery) {
     const aliasesLower  = (k.aliases  || '').toLowerCase();
     const questionLower = (k.question || '').toLowerCase();
 
-    // ── EXACT / SUBSTRING MATCH BOOST (guarantees retrieval) ──
-    // If the user's query contains the topic word, it's definitely relevant
+    // Exact / substring match boost
     let exactBoost = 0;
     const topicWords = topicLower.split(/[\s,]+/).filter(w => w.length > 1);
     for (const tw of topicWords) {
-      if (queryLower.includes(tw)) { exactBoost = 10; break; } // Guaranteed hit
+      if (queryLower.includes(tw)) { exactBoost = 10; break; }
     }
-    // Also check aliases
     if (!exactBoost && aliasesLower) {
       const aliasWords = aliasesLower.split(/[\s,]+/).filter(w => w.length > 1);
       for (const aw of aliasWords) {
         if (queryLower.includes(aw)) { exactBoost = 8; break; }
       }
     }
-    // Also check if topic is contained in the query string directly
     if (!exactBoost && queryLower.includes(topicLower)) { exactBoost = 10; }
 
-    // ── TOKEN SCORES ──
     const topicScore    = tokenScore(queryTokens, k.topic    || '') * 3;
     const questionScore = tokenScore(queryTokens, k.question || '') * 2;
     const aliasScore    = tokenScore(queryTokens, k.aliases  || '') * 2;
@@ -913,13 +922,13 @@ function retrieveKbContext(userQuery) {
 
     return { ...k, score: fullScore };
   })
-  .filter(k => k.score > 0.1) // Very low threshold — exact match boost handles false positives
+  .filter(k => k.score > 0.1)
   .sort((a, b) => b.score - a.score)
-  .slice(0, 5); // Top 5 relevant entries
+  .slice(0, 5);
 
   if (!scored.length) return { context: '', hits: [] };
 
-  console.log('[RAG] Query:', userQuery, '| Hits:', scored.map(h => `${h.topic}(${h.score.toFixed(1)})`));
+  console.log('[RAG] Query:', userQuery, '| Hits:', scored.map(h => `${h.topic}(${h.score.toFixed(1)}) [${h._collection}]`));
 
   const context = '\n\nAdditional verified local knowledge (TRUST THIS OVER YOUR TRAINING DATA — use it exactly as provided, do not contradict it):\n'
     + scored.map(h => `- Q: ${h.question}\n  A: ${h.answer}`).join('\n\n');
@@ -928,28 +937,73 @@ function retrieveKbContext(userQuery) {
 }
 
 /* ══════════════════════════════════════
-   KNOWLEDGE BASE — FIREBASE
-   FIX 1+2: Always fetches SHARED KB from
-   Firestore fresh (no per-user scoping,
-   no caching). All users see the same KB.
+   KNOWLEDGE BASE — MULTI-COLLECTION
+   
+   Strategy:
+   1. Read from EVERY category collection (touristSpots, food,
+      hotels, transport, events, history, generalInfo) PLUS the
+      legacy knowledgeBase collection.
+   2. Merge all results into one flat array with a _collection tag.
+   3. Refresh dynamicKB before every sendMsg so new data is
+      immediately available to all users.
+   4. When saving, write to the correct category collection.
 ══════════════════════════════════════ */
 async function loadKbFromFirebase() {
   const fb = window.__fb; if (!fb) return;
+
+  // All collections to read from (category collections + legacy fallback)
+  const collectionsToRead = [
+    ...Object.values(CATEGORY_COLLECTIONS),
+    FALLBACK_COLLECTION
+  ];
+  // De-duplicate in case any map to the same name
+  const uniqueCollections = [...new Set(collectionsToRead)];
+
   try {
-    // NO orderBy — avoids needing a Firestore composite index that may not exist.
-    // We sort client-side instead.
-    const snap = await fb.getDocs(fb.collection(fb.db, 'knowledgeBase'));
-    dynamicKB = [];
-    snap.forEach(d => dynamicKB.push({ id: d.id, ...d.data() }));
-    // Sort newest first client-side
-    dynamicKB.sort((a, b) => {
+    const allEntries = [];
+
+    // Fetch all collections in parallel for speed
+    const snapshots = await Promise.all(
+      uniqueCollections.map(collName =>
+        fb.getDocs(fb.collection(fb.db, collName))
+          .then(snap => ({ collName, snap }))
+          .catch(err => {
+            console.warn(`[KB] Could not read collection "${collName}":`, err.message);
+            return null;
+          })
+      )
+    );
+
+    for (const result of snapshots) {
+      if (!result) continue;
+      const { collName, snap } = result;
+      snap.forEach(d => {
+        const data = d.data();
+        // Only include entries that have at minimum a topic and answer
+        // (avoids picking up unrelated documents like hotel listings)
+        if (data.topic && data.answer) {
+          allEntries.push({
+            id: d.id,
+            _collection: collName,
+            ...data
+          });
+        }
+      });
+    }
+
+    // Sort newest first (client-side — avoids needing Firestore indexes)
+    allEntries.sort((a, b) => {
       const at = a.timestamp?.toMillis?.() || 0;
       const bt = b.timestamp?.toMillis?.() || 0;
       return bt - at;
     });
-    console.log('[KB] Loaded', dynamicKB.length, 'entries:', dynamicKB.map(k => k.topic));
+
+    dynamicKB = allEntries;
+    console.log('[KB] Loaded', dynamicKB.length, 'entries across', uniqueCollections.join(', '));
     refreshKbChips();
-  } catch(e) { console.warn('KB load error:', e); }
+  } catch(e) {
+    console.warn('[KB] Load error:', e);
+  }
 }
 
 function refreshKbChips() {
@@ -971,36 +1025,70 @@ async function loadKbView() {
   renderKbView();
 }
 
+let _kbFilterCat = 'all';
+
+function filterKbView(cat) {
+  _kbFilterCat = cat;
+  document.querySelectorAll('.kb-filter-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.cat === cat);
+  });
+  renderKbView();
+}
+
 function renderKbView() {
   const list = document.getElementById('kbViewList');
   const catEmoji = { tourist_spots:'🏛️', food:'🍜', hotels:'🏨', transport:'🚌', events:'🎉', history:'📜', general:'🗺️' };
-  if (!dynamicKB.length) {
-    list.innerHTML = `<div class="empty-state"><div>📚</div><p>No custom entries yet.<br>Tap ＋ to add your first one!</p></div>`;
+
+  // Map Firestore collection name back to category key for display
+  const collToCat = {};
+  for (const [cat, coll] of Object.entries(CATEGORY_COLLECTIONS)) {
+    collToCat[coll] = cat;
+  }
+
+  let entries = dynamicKB;
+  if (_kbFilterCat !== 'all') {
+    const targetColl = CATEGORY_COLLECTIONS[_kbFilterCat];
+    entries = dynamicKB.filter(k => {
+      const kcat = k.category || collToCat[k._collection] || 'general';
+      return kcat === _kbFilterCat || k._collection === targetColl;
+    });
+  }
+
+  if (!entries.length) {
+    list.innerHTML = `<div class="empty-state"><div>📚</div><p>No entries${_kbFilterCat !== 'all' ? ' in this category' : ''} yet.<br>Tap ＋ to add your first one!</p></div>`;
     return;
   }
-  list.innerHTML = dynamicKB.map(k => `
+
+  list.innerHTML = entries.map(k => {
+    const cat = k.category || collToCat[k._collection] || 'general';
+    const coll = k._collection || CATEGORY_COLLECTIONS[cat] || FALLBACK_COLLECTION;
+    return `
     <div class="kb-entry">
       <div class="kb-entry-topic">${escHtml(k.topic)}</div>
       <div class="kb-entry-q">❓ ${escHtml(k.question)}</div>
-      <div class="kb-entry-a">💬 ${escHtml((k.answer||'').substring(0, 120))}${(k.answer||'').length > 120 ? '…' : ''}</div>
+      <div class="kb-entry-a">💬 ${escHtml((k.answer||'').substring(0,120))}${(k.answer||'').length > 120 ? '…' : ''}</div>
       ${k.aliases ? `<div class="kb-entry-a" style="margin-top:4px;font-size:10px;color:rgba(245,158,11,0.5)">🔗 ${escHtml(k.aliases)}</div>` : ''}
-      <span class="kb-entry-badge">${catEmoji[k.category] || '🗺️'} ${(k.category||'general').replace('_',' ')}</span>
-      <button class="kb-entry-del" onclick="deleteKbEntry('${k.id}')">🗑 Del</button>
-    </div>`).join('');
+      <span class="kb-entry-badge">${catEmoji[cat] || '🗺️'} ${(cat||'general').replace('_',' ')}</span>
+      <span class="kb-entry-coll">📂 ${escHtml(coll)}</span>
+      <button class="kb-entry-del" onclick="deleteKbEntry('${k.id}','${escHtml(coll)}')">🗑 Del</button>
+    </div>`;
+  }).join('');
 }
 
-async function deleteKbEntry(id) {
+async function deleteKbEntry(id, collName) {
   const fb = window.__fb; if (!fb) return;
+  const targetColl = collName || FALLBACK_COLLECTION;
   try {
-    await fb.deleteDoc(fb.doc(fb.db, 'knowledgeBase', id));
+    await fb.deleteDoc(fb.doc(fb.db, targetColl, id));
     dynamicKB = dynamicKB.filter(k => k.id !== id);
     renderKbView();
     refreshKbChips();
-    showToast('✅ Entry deleted', 'success');
+    showToast('✅ Entry deleted from ' + targetColl, 'success');
   } catch(e) { showToast('❌ Delete failed: ' + e.message, 'error'); }
 }
 
 function openKbModal() {
+  updateCollPreview();
   document.getElementById('kbModal').classList.add('open');
   document.getElementById('modalBg').classList.add('open');
   setTimeout(() => document.getElementById('kbTopic').focus(), 200);
@@ -1010,15 +1098,21 @@ function closeKbModal() {
   document.getElementById('modalBg').classList.remove('open');
   ['kbTopic','kbQuestion','kbAnswer','kbAliases'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('kbCategory').value = 'tourist_spots';
+  updateCollPreview();
   const btn = document.getElementById('kbSaveBtn');
   btn.disabled = false; btn.innerHTML = '💾 Save to Firebase';
 }
 document.getElementById('modalBg').onclick = closeKbModal;
-document.getElementById('addKbBtn').onclick  = openKbModal;
+document.getElementById('addKbBtn').onclick = openKbModal;
 
-// FIX 2+3: KB saves are GLOBAL (no uid restriction).
-// Guests can save KB entries — they persist for ALL users.
-// KB is NOT deleted for guests. Only chat history is skipped for guests.
+/* ══════════════════════════════════════
+   SAVE KB ENTRY → CATEGORY COLLECTION
+   
+   Writes to the Firestore collection that
+   matches the selected category, so data
+   lands in the correct collection and is
+   retrievable by all users immediately.
+══════════════════════════════════════ */
 async function saveKbEntry() {
   const topic    = document.getElementById('kbTopic').value.trim();
   const question = document.getElementById('kbQuestion').value.trim();
@@ -1036,23 +1130,38 @@ async function saveKbEntry() {
   const fb = window.__fb;
   if (!fb) { showToast('❌ Firebase not ready', 'error'); btn.disabled = false; btn.innerHTML = '💾 Save to Firebase'; return; }
 
+  // ── DETERMINE TARGET COLLECTION based on selected category ──
+  const targetCollection = CATEGORY_COLLECTIONS[category] || FALLBACK_COLLECTION;
+
   try {
-    // Save to Firestore with NO uid restriction — globally shared
-    const ref = await fb.addDoc(fb.collection(fb.db, 'knowledgeBase'), {
-      topic, question, answer, aliases,
+    const entryData = {
+      topic,
+      question,
+      answer,
+      aliases,
       category,
-      // Track who added it (for admin), but KB is still accessible to all
+      isShared: true,           // Explicit — accessible to all users
       addedBy: currentUser ? currentUser.uid : 'guest',
       addedByName: currentUser ? (currentUser.displayName || currentUser.email) : 'Guest',
-      isShared: true,  // Explicit shared flag
       timestamp: fb.serverTimestamp()
+    };
+
+    // Save to the category-specific Firestore collection
+    const ref = await fb.addDoc(fb.collection(fb.db, targetCollection), entryData);
+
+    console.log(`[KB] Saved "${topic}" to collection "${targetCollection}" with id: ${ref.id}`);
+
+    // Update local cache immediately so current session can use it
+    dynamicKB.unshift({
+      id: ref.id,
+      _collection: targetCollection,
+      ...entryData,
+      timestamp: { toMillis: () => Date.now() } // Local placeholder
     });
-    // Update local cache immediately
-    dynamicKB.unshift({ id: ref.id, topic, question, answer, aliases, category });
     renderKbView();
     refreshKbChips();
     closeKbModal();
-    showToast('✅ "' + topic + '" added! AI now knows this 🌺', 'success');
+    showToast(`✅ "${topic}" saved to ${targetCollection}! AI now knows this 🌺`, 'success');
   } catch(e) {
     showToast('❌ Save failed: ' + e.message, 'error');
     btn.disabled = false; btn.innerHTML = '💾 Save to Firebase';
@@ -1060,7 +1169,10 @@ async function saveKbEntry() {
 }
 
 /* ══════════════════════════════════════
-   CHAT — with RAG+NLP+LLM anti-hallucination
+   CHAT — NLP+RAG+LLM
+   Reloads ALL category collections fresh
+   before every message to ensure the AI
+   always has the latest KB data.
 ══════════════════════════════════════ */
 function goChat(prefill) {
   if (prefill && typeof prefill === 'string') document.getElementById('chatInput').value = prefill;
@@ -1089,46 +1201,40 @@ function detectTopic(text) {
   if (t.includes('spot') || t.includes('tour') || t.includes('visit') || t.includes('place') || t.includes('church') || t.includes('beach') || t.includes('attraction')) return 'Tourist Spots';
   if (t.includes('transport') || t.includes('bus') || t.includes('jeep') || t.includes('taxi') || t.includes('ride') || t.includes('travel') || t.includes('ferry')) return 'Transport';
   if (t.includes('event') || t.includes('festival') || t.includes('dinagyang') || t.includes('happening') || t.includes('celebration') || t.includes('fiesta')) return 'Events';
-  // Check KB topics
   for (const k of dynamicKB) {
     if (t.includes((k.topic || '').toLowerCase())) return (k.category || '').replace('_', ' ') || 'General';
   }
   return 'General';
 }
 
-// FIX 1 (main): sendMsg ALWAYS reloads KB from Firestore before building the system prompt.
-// FIX 5: RAG context is injected into the system prompt with strong anti-hallucination instructions.
-// FIX 3: Chat history is only saved for logged-in users (saveChatMessage checks currentUser).
 async function sendMsg() {
   const input = document.getElementById('chatInput');
   const text  = input.value.trim();
   if (!text) return;
   input.value = '';
 
-  // Create session if needed (only for logged-in users)
   if (!currentSessionId && currentUser) await createSession(currentUser);
 
-  // ── FIX 1: ALWAYS reload shared KB fresh from Firestore before every message ──
+  // ── ALWAYS reload ALL KB collections fresh before answering ──
+  // This ensures any entry just added by any user is immediately available
   await loadKbFromFirebase();
 
   const topic = detectTopic(text);
   appendMsg('user', text);
 
-  // ── FIX 5: NLP+RAG — find relevant KB entries ──
+  // NLP+RAG — retrieve matching KB entries
   const { context: kbCtx, hits } = retrieveKbContext(text);
 
-  // Build system prompt with KB context injected
+  // Inject retrieved context into the system prompt
   const systemWithKb = BASE_SYSTEM + kbCtx;
 
-  // Build messages array for API
   const msgsToSend = [
     { role: 'system', content: systemWithKb },
-    ...currentChatMessages.slice(1), // Conversation history (no system)
+    ...currentChatMessages.slice(1),
     { role: 'user', content: text }
   ];
   currentChatMessages.push({ role: 'user', content: text });
 
-  // FIX 3: Only save for logged-in users
   await saveChatMessage('user', text, topic);
 
   const typingEl = appendMsg('bot', '', true);
@@ -1148,14 +1254,13 @@ async function sendMsg() {
     currentChatMessages.push({ role: 'assistant', content: reply });
     lastBotReply = reply;
 
-    // Show RAG badge if KB entries were used
     let replyHtml = reply;
     if (hits.length > 0) {
-      replyHtml += `<div><span class="rag-badge">✓ Verified local data</span></div>`;
+      const collsUsed = [...new Set(hits.map(h => h._collection).filter(Boolean))].join(', ');
+      replyHtml += `<div><span class="rag-badge">✓ Verified local data${collsUsed ? ' · ' + collsUsed : ''}</span></div>`;
     }
     typingEl.querySelector('.msg-bubble').innerHTML = replyHtml;
 
-    // FIX 3: Only save chat history for logged-in users
     await saveChatMessage('assistant', reply, topic);
 
     document.getElementById('feedbackBar').style.display = 'flex';
@@ -1168,13 +1273,12 @@ async function sendMsg() {
 }
 
 /* ══════════════════════════════════════
-   HISTORY (only for logged-in users)
+   HISTORY
 ══════════════════════════════════════ */
 async function loadHistory() {
   const fb = window.__fb;
   const container = document.getElementById('historyList');
   if (!fb || !currentUser) {
-    // FIX 3: Guests see explanation instead of history
     container.innerHTML = `<div class="empty-state"><div>🔑</div><p>Sign in to save and view your chat history.<br><br>Guest conversations are not saved.</p></div>`;
     return;
   }
@@ -1263,9 +1367,9 @@ function escHtml(str) {
 /* ══════════════════════════════════════
    MENU
 ══════════════════════════════════════ */
-function openMenu()       { document.getElementById('menuOverlay').classList.add('open'); }
-function closeMenuDirect(){ document.getElementById('menuOverlay').classList.remove('open'); }
-function closeMenu(e)     { if (e.target === document.getElementById('menuOverlay')) closeMenuDirect(); }
+function openMenu()        { document.getElementById('menuOverlay').classList.add('open'); }
+function closeMenuDirect() { document.getElementById('menuOverlay').classList.remove('open'); }
+function closeMenu(e)      { if (e.target === document.getElementById('menuOverlay')) closeMenuDirect(); }
 
 /* ══════════════════════════════════════
    TOAST
