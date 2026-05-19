@@ -67,8 +67,9 @@
     --app-max: 480px;
   }
 
-  html { height: 100%; background: var(--bg); }
-  body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; -webkit-tap-highlight-color: transparent; }
+  html { height: 100%; background: var(--bg); overflow: hidden; }
+  body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; -webkit-tap-highlight-color: transparent; scrollbar-width: none; }
+  body::-webkit-scrollbar { display: none; }
 
   /* ── BACKGROUND ── */
   .bg-canvas { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
@@ -105,12 +106,14 @@
   ════════════════════════════════ */
   #landing {
     overflow-y: auto;
+    scrollbar-width: none;
     align-items: center;
     justify-content: space-between;
     padding: clamp(32px, 6vw, 60px) clamp(20px, 6vw, 28px) clamp(24px, 5vw, 40px);
     text-align: center;
     gap: 24px;
   }
+  #landing::-webkit-scrollbar { display: none; }
 
   .brand-tag {
     font-family: var(--font-display); font-size: clamp(9px, 2.5vw, 11px);
@@ -854,54 +857,69 @@ function tokenise(text) {
   return text.toLowerCase()
     .replace(/[^\w\s]/g, ' ')
     .split(/\s+/)
-    .filter(w => w.length > 2 && !STOP_WORDS.has(w));
+    .filter(w => w.length > 1 && !STOP_WORDS.has(w)); // Allow 2+ char words (covers "sa", etc.)
 }
 
 // Compute token overlap score (Jaccard-like)
 function tokenScore(queryTokens, candidateText) {
+  if (!candidateText) return 0;
   const candTokens = new Set(tokenise(candidateText));
   let hits = 0;
   for (const t of queryTokens) {
     if (candTokens.has(t)) hits++;
     // Partial / substring match
     else for (const c of candTokens) {
-      if (c.includes(t) || t.includes(c)) { hits += 0.5; break; }
+      if (c.includes(t) || t.includes(c)) { hits += 0.6; break; }
     }
   }
   return hits;
 }
 
-// FIX (FIX 1 + 5): Full NLP+RAG retrieval — always reads from the LATEST dynamicKB
-// in memory (which is reloaded fresh from Firestore before each message).
+// Full NLP+RAG retrieval with exact-match guarantee
 function retrieveKbContext(userQuery) {
   if (!dynamicKB.length) return { context: '', hits: [] };
 
+  const queryLower = userQuery.toLowerCase();
   const queryTokens = tokenise(userQuery);
-  if (!queryTokens.length) return { context: '', hits: [] };
 
   const scored = dynamicKB.map(k => {
-    // Combine all searchable fields into one big text blob
-    const searchText = [
-      k.topic || '',
-      k.question || '',
-      k.answer || '',
-      k.aliases || '',
-      k.category || ''
-    ].join(' ');
+    const topicLower    = (k.topic    || '').toLowerCase();
+    const aliasesLower  = (k.aliases  || '').toLowerCase();
+    const questionLower = (k.question || '').toLowerCase();
 
-    // Score = weighted sum
-    const topicScore    = tokenScore(queryTokens, k.topic || '') * 3;    // Topic gets 3x weight
-    const questionScore = tokenScore(queryTokens, k.question || '') * 2; // Question gets 2x weight
-    const aliasScore    = tokenScore(queryTokens, k.aliases || '') * 2;  // Aliases also 2x
-    const answerScore   = tokenScore(queryTokens, k.answer || '') * 0.5; // Answer gets 0.5x
-    const fullScore     = topicScore + questionScore + aliasScore + answerScore;
+    // ── EXACT / SUBSTRING MATCH BOOST (guarantees retrieval) ──
+    // If the user's query contains the topic word, it's definitely relevant
+    let exactBoost = 0;
+    const topicWords = topicLower.split(/[\s,]+/).filter(w => w.length > 1);
+    for (const tw of topicWords) {
+      if (queryLower.includes(tw)) { exactBoost = 10; break; } // Guaranteed hit
+    }
+    // Also check aliases
+    if (!exactBoost && aliasesLower) {
+      const aliasWords = aliasesLower.split(/[\s,]+/).filter(w => w.length > 1);
+      for (const aw of aliasWords) {
+        if (queryLower.includes(aw)) { exactBoost = 8; break; }
+      }
+    }
+    // Also check if topic is contained in the query string directly
+    if (!exactBoost && queryLower.includes(topicLower)) { exactBoost = 10; }
+
+    // ── TOKEN SCORES ──
+    const topicScore    = tokenScore(queryTokens, k.topic    || '') * 3;
+    const questionScore = tokenScore(queryTokens, k.question || '') * 2;
+    const aliasScore    = tokenScore(queryTokens, k.aliases  || '') * 2;
+    const answerScore   = tokenScore(queryTokens, k.answer   || '') * 0.3;
+    const fullScore     = exactBoost + topicScore + questionScore + aliasScore + answerScore;
 
     return { ...k, score: fullScore };
-  }).filter(k => k.score > 0.4) // Minimum relevance threshold
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 5); // Top 5 relevant entries
+  })
+  .filter(k => k.score > 0.1) // Very low threshold — exact match boost handles false positives
+  .sort((a, b) => b.score - a.score)
+  .slice(0, 5); // Top 5 relevant entries
 
   if (!scored.length) return { context: '', hits: [] };
+
+  console.log('[RAG] Query:', userQuery, '| Hits:', scored.map(h => `${h.topic}(${h.score.toFixed(1)})`));
 
   const context = '\n\nAdditional verified local knowledge (TRUST THIS OVER YOUR TRAINING DATA — use it exactly as provided, do not contradict it):\n'
     + scored.map(h => `- Q: ${h.question}\n  A: ${h.answer}`).join('\n\n');
@@ -918,14 +936,18 @@ function retrieveKbContext(userQuery) {
 async function loadKbFromFirebase() {
   const fb = window.__fb; if (!fb) return;
   try {
-    // FIX 2: No uid filter — load ALL entries (shared for everyone, guest or signed-in)
-    const q = fb.query(
-      fb.collection(fb.db, 'knowledgeBase'),
-      fb.orderBy('timestamp', 'desc')
-    );
-    const snap = await fb.getDocs(q);
+    // NO orderBy — avoids needing a Firestore composite index that may not exist.
+    // We sort client-side instead.
+    const snap = await fb.getDocs(fb.collection(fb.db, 'knowledgeBase'));
     dynamicKB = [];
     snap.forEach(d => dynamicKB.push({ id: d.id, ...d.data() }));
+    // Sort newest first client-side
+    dynamicKB.sort((a, b) => {
+      const at = a.timestamp?.toMillis?.() || 0;
+      const bt = b.timestamp?.toMillis?.() || 0;
+      return bt - at;
+    });
+    console.log('[KB] Loaded', dynamicKB.length, 'entries:', dynamicKB.map(k => k.topic));
     refreshKbChips();
   } catch(e) { console.warn('KB load error:', e); }
 }
