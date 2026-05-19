@@ -573,10 +573,10 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  /* ══ CONFIG — no API key here, handled server-side via /api/chat ══ */
+  /* ══ CONFIG ══ */
   const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
-  const BASE_SYSTEM = 'You are a friendly and knowledgeable AI travel guide for Iloilo City, Philippines. You speak warmly and helpfully, sometimes using Ilonggo greetings like "Maayong aga" or "Kamusta". Keep answers concise and practical. Focus on tourist spots, food, hotels, transport, and local events in Iloilo.';
+  const BASE_SYSTEM = 'You are a friendly and knowledgeable AI travel guide for Iloilo City, Philippines. You speak warmly and helpfully, sometimes using Ilonggo greetings like "Maayong aga" or "Kamusta". Keep answers concise and practical. Focus on tourist spots, food, hotels, transport, and local events in Iloilo. IMPORTANT: If the user asks about a topic that is covered in the "Additional local knowledge" section provided to you, you MUST use that information in your answer and do NOT make up or hallucinate information that contradicts it.';
 
   /* ══ STATE ══ */
   let currentUser = null;
@@ -627,7 +627,7 @@
     isGuest = true; currentUser = null;
     currentSessionId = 'guest_' + Date.now();
     updateUIForUser(null);
-    loadKbFromFirebase();
+    loadKbFromFirebase(); // Background load for chips on home screen
     showView('home');
   }
 
@@ -636,7 +636,7 @@
     updateUIForUser(user);
     await saveUserToFirestore(user);
     await createSession(user);
-    loadKbFromFirebase();
+    loadKbFromFirebase(); // Background load for chips on home screen
     showView('home');
     showToast('Welcome, ' + (user.displayName || 'traveler') + '! 🌺');
   }
@@ -708,6 +708,9 @@
   }
 
   /* ══ KNOWLEDGE BASE ══ */
+
+  // FIX: Always fetches fresh data from Firestore — no caching.
+  // This ensures ANY user gets the latest shared KB on every message.
   async function loadKbFromFirebase() {
     const fb = window.__fb; if (!fb) return;
     try {
@@ -729,7 +732,7 @@
       k.answer.toLowerCase().split(/\s+/).some(w => w.length > 5 && q.includes(w))
     );
     if (!hits.length) return '';
-    return '\n\nAdditional local knowledge:\n' + hits.map(h => `- ${h.question}: ${h.answer}`).join('\n');
+    return '\n\nAdditional local knowledge (use this information exactly as provided):\n' + hits.map(h => `- ${h.question}: ${h.answer}`).join('\n');
   }
 
   function refreshKbChips() {
@@ -828,7 +831,7 @@
     }
   }
 
-  /* ══ CHAT — calls /api/chat proxy, no key in frontend ══ */
+  /* ══ CHAT ══ */
   function goChat(prefill) {
     if (prefill && typeof prefill === 'string') document.getElementById('chatInput').value = prefill;
     showView('chat');
@@ -862,6 +865,9 @@
     return 'General';
   }
 
+  // FIX: sendMsg now always fetches the latest KB from Firestore BEFORE
+  // building the system prompt. This means every user, on every message,
+  // gets the full shared knowledge base — no stale in-memory cache issues.
   async function sendMsg() {
     const input = document.getElementById('chatInput');
     const text = input.value.trim();
@@ -869,6 +875,9 @@
     input.value = '';
 
     if (!currentSessionId) await createSession(null);
+
+    // ── KEY FIX: Always reload KB fresh from Firestore before each message ──
+    await loadKbFromFirebase();
 
     const topic = detectTopic(text);
     appendMsg('user', text);
@@ -888,7 +897,6 @@
     document.getElementById('feedbackBar').style.display = 'none';
 
     try {
-      /* Key lives in Vercel env — never exposed to the browser */
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
