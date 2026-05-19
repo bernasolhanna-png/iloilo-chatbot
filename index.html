@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Iloilo Travel Guide — AI Chatbot</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 
@@ -63,11 +63,14 @@
     --card-radius: 20px;
     --font-display: 'Syne', sans-serif;
     --font-body: 'DM Sans', sans-serif;
+    /* Responsive max-width for app shell */
+    --app-max: 480px;
   }
 
-  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; }
-  #landing { overflow-y: auto !important; }
+  html { height: 100%; background: var(--bg); }
+  body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); overflow: hidden; -webkit-tap-highlight-color: transparent; }
 
+  /* ── BACKGROUND ── */
   .bg-canvas { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
   .bg-canvas::before {
     content: ''; position: absolute; inset: 0;
@@ -83,19 +86,48 @@
     mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 80%);
   }
 
-  .app { position: relative; z-index: 1; height: 100vh; display: flex; max-width: 420px; margin: 0 auto; flex-direction: column; }
-  .view { display: none; flex-direction: column; height: 100%; }
+  /* ── APP SHELL (responsive) ── */
+  .app-shell {
+    position: relative; z-index: 1;
+    height: 100vh; height: 100dvh;
+    display: flex; flex-direction: column;
+    max-width: var(--app-max);
+    margin: 0 auto;
+    /* On wide screens, add subtle side borders */
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.04);
+  }
+
+  .view { display: none; flex-direction: column; height: 100%; overflow: hidden; }
   .view.active { display: flex; }
 
-  /* ── LANDING ── */
-  #landing { align-items: center; justify-content: space-between; padding: 60px 28px 40px; text-align: center; }
-  .brand-tag { font-family: var(--font-display); font-size: 11px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--purple-light); background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.25); padding: 6px 16px; border-radius: 100px; }
-  .orb-wrapper { position: relative; width: 220px; height: 220px; display: flex; align-items: center; justify-content: center; }
+  /* ════════════════════════════════
+     LANDING
+  ════════════════════════════════ */
+  #landing {
+    overflow-y: auto;
+    align-items: center;
+    justify-content: space-between;
+    padding: clamp(32px, 6vw, 60px) clamp(20px, 6vw, 28px) clamp(24px, 5vw, 40px);
+    text-align: center;
+    gap: 24px;
+  }
+
+  .brand-tag {
+    font-family: var(--font-display); font-size: clamp(9px, 2.5vw, 11px);
+    font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--purple-light);
+    background: rgba(168,85,247,0.12); border: 1px solid rgba(168,85,247,0.25);
+    padding: 6px 16px; border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .orb-wrapper { position: relative; width: clamp(160px,45vw,220px); height: clamp(160px,45vw,220px); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .orb-rings { position: absolute; inset: 0; border-radius: 50%; animation: rings-spin 12s linear infinite; }
   .orb-rings::before, .orb-rings::after { content: ''; position: absolute; inset: -18px; border-radius: 50%; border: 1px solid rgba(168,85,247,0.2); }
   .orb-rings::after { inset: -36px; border-color: rgba(59,130,246,0.12); animation-direction: reverse; animation-duration: 18s; }
   @keyframes rings-spin { to { transform: rotate(360deg); } }
-  .orb { width: 160px; height: 160px; border-radius: 50%; position: relative; animation: orb-float 4s ease-in-out infinite; cursor: pointer; flex-shrink: 0; }
+
+  .orb { width: clamp(110px,33vw,160px); height: clamp(110px,33vw,160px); border-radius: 50%; position: relative; animation: orb-float 4s ease-in-out infinite; cursor: pointer; flex-shrink: 0; }
   .orb-inner { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(from 0deg, #3b82f6 0deg, #7c3aed 90deg, #ec4899 160deg, #a855f7 220deg, #06b6d4 280deg, #3b82f6 360deg); position: relative; overflow: hidden; box-shadow: 0 0 60px rgba(124,58,237,0.6), 0 0 120px rgba(124,58,237,0.3), inset 0 0 40px rgba(0,0,0,0.5); }
   .orb-inner::before { content: ''; position: absolute; top: 10%; left: 15%; width: 40%; height: 35%; background: rgba(255,255,255,0.22); border-radius: 50%; filter: blur(8px); transform: rotate(-30deg); }
   .orb-inner::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: repeating-conic-gradient(rgba(255,255,255,0.04) 0deg 10deg, transparent 10deg 20deg); animation: orb-swirl 8s linear infinite; }
@@ -108,111 +140,127 @@
   .orb-pulse::before, .orb-pulse::after { content: ''; position: absolute; inset: -10px; border-radius: 50%; border: 1px solid rgba(168,85,247,0.35); animation: pulse-out 3s ease-out infinite; }
   .orb-pulse::after { animation-delay: 1.5s; }
   @keyframes pulse-out { 0%{transform:scale(1);opacity:0.7} 100%{transform:scale(1.5);opacity:0} }
-  .hero-text h1 { font-family: var(--font-display); font-size: 32px; font-weight: 800; line-height: 1.15; margin-bottom: 10px; }
+
+  .hero-text h1 { font-family: var(--font-display); font-size: clamp(24px,7vw,32px); font-weight: 800; line-height: 1.15; margin-bottom: 10px; }
   .hero-text h1 span { color: var(--purple-light); }
-  .hero-text p { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 280px; margin: 0 auto; }
-  .landing-actions { width: 100%; display: flex; flex-direction: column; gap: 12px; }
-  .btn-primary { width: 100%; padding: 16px; border-radius: 14px; border: none; background: linear-gradient(135deg, var(--purple), var(--purple-light)); color: #fff; font-family: var(--font-display); font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.25s; box-shadow: 0 8px 32px rgba(124,58,237,0.4); }
+  .hero-text p { font-size: clamp(13px,3.5vw,14px); color: var(--muted); line-height: 1.6; max-width: 280px; margin: 0 auto; }
+
+  .landing-actions { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+  .btn-primary { width: 100%; padding: clamp(13px,4vw,16px); border-radius: 14px; border: none; background: linear-gradient(135deg, var(--purple), var(--purple-light)); color: #fff; font-family: var(--font-display); font-size: clamp(13px,4vw,15px); font-weight: 700; cursor: pointer; transition: all 0.25s; box-shadow: 0 8px 32px rgba(124,58,237,0.4); touch-action: manipulation; }
   .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(124,58,237,0.55); }
+  .btn-primary:active { transform: translateY(0); }
   .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-  .btn-guest { width: 100%; padding: 15px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: var(--font-body); font-size: 14px; cursor: pointer; transition: all 0.25s; backdrop-filter: blur(10px); }
+  .btn-guest { width: 100%; padding: clamp(12px,4vw,15px); border-radius: 14px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-family: var(--font-body); font-size: clamp(12px,3.5vw,14px); cursor: pointer; transition: all 0.25s; backdrop-filter: blur(10px); touch-action: manipulation; }
   .btn-guest:hover { border-color: rgba(168,85,247,0.3); color: var(--text); }
-  .btn-admin { width: 100%; padding: 12px; border-radius: 14px; border: 1px solid rgba(245,158,11,0.3); background: rgba(245,158,11,0.06); color: var(--gold); font-family: var(--font-body); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.25s; backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-admin { width: 100%; padding: clamp(10px,3.5vw,12px); border-radius: 14px; border: 1px solid rgba(245,158,11,0.3); background: rgba(245,158,11,0.06); color: var(--gold); font-family: var(--font-body); font-size: clamp(11px,3vw,13px); font-weight: 500; cursor: pointer; transition: all 0.25s; backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; gap: 8px; touch-action: manipulation; }
   .btn-admin:hover { border-color: rgba(245,158,11,0.5); background: rgba(245,158,11,0.1); }
 
-  /* ── GOOGLE SIGNIN MODAL ── */
+  /* ── SIGN IN MODAL ── */
   .modal-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(7,6,15,0.85); backdrop-filter: blur(10px); align-items: center; justify-content: center; padding: 24px; }
   .modal-overlay.open { display: flex; }
-  .modal-card { background: rgba(15,12,28,0.98); border: 1px solid var(--border); border-radius: 24px; padding: 36px 28px; width: 100%; max-width: 360px; text-align: center; backdrop-filter: blur(20px); animation: modal-in 0.3s ease; }
+  .modal-card { background: rgba(15,12,28,0.98); border: 1px solid var(--border); border-radius: 24px; padding: clamp(24px,6vw,36px) clamp(20px,5vw,28px); width: 100%; max-width: 360px; text-align: center; backdrop-filter: blur(20px); animation: modal-in 0.3s ease; }
   @keyframes modal-in { from{opacity:0;transform:scale(0.93)} to{opacity:1;transform:scale(1)} }
   .modal-orb { width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 20px; background: conic-gradient(from 0deg, #3b82f6, #7c3aed, #ec4899, #a855f7, #06b6d4, #3b82f6); box-shadow: 0 0 30px rgba(124,58,237,0.6); animation: orb-swirl 8s linear infinite; position: relative; overflow: hidden; }
   .modal-orb::after { content:''; position:absolute; inset:0; border-radius:50%; background: repeating-conic-gradient(rgba(255,255,255,0.05) 0deg 10deg, transparent 10deg 20deg); animation: orb-swirl 8s linear infinite; }
-  .modal-card h2 { font-family:var(--font-display); font-size:22px; font-weight:800; margin-bottom:8px; }
-  .modal-card p { font-size:13px; color:var(--muted); line-height:1.6; margin-bottom:28px; }
-  .btn-google { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); border: none; color: #fff; font-family: var(--font-display); font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.25s; box-shadow: 0 8px 28px rgba(124,58,237,0.4); margin-bottom: 12px; }
-  .btn-google:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(124,58,237,0.55); }
+  .modal-card h2 { font-family:var(--font-display); font-size:clamp(18px,5vw,22px); font-weight:800; margin-bottom:8px; }
+  .modal-card p { font-size:clamp(12px,3vw,13px); color:var(--muted); line-height:1.6; margin-bottom:28px; }
+  .btn-google { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 12px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); border: none; color: #fff; font-family: var(--font-display); font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.25s; box-shadow: 0 8px 28px rgba(124,58,237,0.4); margin-bottom: 12px; touch-action: manipulation; }
+  .btn-google:hover { transform: translateY(-2px); }
   .btn-google:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-  .btn-modal-cancel { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.2s; }
+  .btn-modal-cancel { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.2s; touch-action: manipulation; }
   .btn-modal-cancel:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
   .modal-error { margin-top: 12px; font-size: 12px; color: #ef4444; background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 10px 14px; display: none; }
 
-  /* ── HOME ── */
-  #home { padding: 0; overflow: hidden; }
-  .home-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 16px; }
-  .menu-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; transition: all 0.2s; }
+  /* ════════════════════════════════
+     HOME
+  ════════════════════════════════ */
+  #home { padding: 0; }
+  .home-header { display: flex; align-items: center; justify-content: space-between; padding: clamp(14px,4vw,20px) clamp(16px,5vw,24px) 12px; flex-shrink: 0; }
+  .menu-btn { width: 38px; height: 38px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; touch-action: manipulation; }
   .menu-btn span { display: block; width: 18px; height: 2px; background: var(--text); border-radius: 2px; }
-  .menu-btn:hover { background: var(--surface2); }
-  .status-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 6px 12px; }
-  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.7); animation: blink 2s ease-in-out infinite; }
+  .menu-btn:hover, .menu-btn:active { background: var(--surface2); }
+  .status-badge { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 100px; padding: 6px 12px; white-space: nowrap; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 6px rgba(34,197,94,0.7); animation: blink 2s ease-in-out infinite; flex-shrink: 0; }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.4} }
-  .avatar-btn { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--blue)); border: 2px solid rgba(168,85,247,0.4); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; overflow: hidden; }
+  .avatar-btn { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--blue)); border: 2px solid rgba(168,85,247,0.4); display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; overflow: hidden; flex-shrink: 0; touch-action: manipulation; }
   .avatar-btn img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-  .home-scroll { flex: 1; overflow-y: auto; padding: 0 20px 100px; }
+
+  .home-scroll { flex: 1; overflow-y: auto; padding: 0 clamp(14px,4vw,20px) 120px; -webkit-overflow-scrolling: touch; }
   .home-scroll::-webkit-scrollbar { display: none; }
-  .greeting { padding: 10px 0 20px; }
-  .greeting .sub { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
-  .greeting h2 { font-family: var(--font-display); font-size: 26px; font-weight: 800; line-height: 1.2; }
+
+  .greeting { padding: 10px 0 16px; }
+  .greeting .sub { font-size: clamp(12px,3vw,13px); color: var(--muted); margin-bottom: 4px; }
+  .greeting h2 { font-family: var(--font-display); font-size: clamp(20px,6vw,26px); font-weight: 800; line-height: 1.2; }
   .greeting h2 span { color: var(--purple-light); }
-  .home-orb-container { display: flex; align-items: center; justify-content: center; padding: 10px 0 20px; }
-  .home-orb { width: 90px; height: 90px; border-radius: 50%; position: relative; animation: orb-float 4s ease-in-out infinite; cursor: pointer; }
+
+  .home-orb-container { display: flex; align-items: center; justify-content: center; padding: 8px 0 16px; cursor: pointer; }
+  .home-orb { width: clamp(70px,20vw,90px); height: clamp(70px,20vw,90px); border-radius: 50%; position: relative; animation: orb-float 4s ease-in-out infinite; }
   .home-orb-inner { width: 100%; height: 100%; border-radius: 50%; background: conic-gradient(from 0deg, #3b82f6, #7c3aed, #ec4899, #a855f7, #06b6d4, #3b82f6); box-shadow: 0 0 40px rgba(124,58,237,0.7), 0 0 80px rgba(124,58,237,0.3), inset 0 0 20px rgba(0,0,0,0.4); overflow: hidden; position: relative; }
   .home-orb-inner::before { content: ''; position: absolute; top: 12%; left: 18%; width: 35%; height: 30%; background: rgba(255,255,255,0.25); border-radius: 50%; filter: blur(5px); transform: rotate(-30deg); }
   .home-orb-inner::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: repeating-conic-gradient(rgba(255,255,255,0.05) 0deg 10deg, transparent 10deg 20deg); animation: orb-swirl 8s linear infinite; }
-  .quick-input-wrap { position: relative; margin-bottom: 20px; }
-  .quick-input { width: 100%; padding: 14px 48px 14px 16px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--font-body); font-size: 14px; outline: none; backdrop-filter: blur(10px); transition: border-color 0.2s; }
+
+  .quick-input-wrap { position: relative; margin-bottom: 16px; }
+  .quick-input { width: 100%; padding: 13px 48px 13px 16px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--font-body); font-size: clamp(13px,3.5vw,14px); outline: none; backdrop-filter: blur(10px); transition: border-color 0.2s; }
   .quick-input::placeholder { color: var(--muted); }
   .quick-input:focus { border-color: rgba(168,85,247,0.4); }
-  .quick-input-icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; border-radius: 8px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; }
-  .chips-row { display: flex; gap: 8px; margin-bottom: 24px; overflow-x: auto; scrollbar-width: none; }
+  .quick-input-icon { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg, var(--purple), var(--purple-light)); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 13px; touch-action: manipulation; }
+
+  .chips-row { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
   .chips-row::-webkit-scrollbar { display: none; }
-  .chip { flex-shrink: 0; padding: 8px 14px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-  .chip:hover, .chip.active { border-color: rgba(168,85,247,0.4); background: rgba(168,85,247,0.1); color: var(--purple-light); }
+  .chip { flex-shrink: 0; padding: 7px 13px; border-radius: 100px; border: 1px solid var(--border); background: var(--surface); color: var(--muted); font-size: clamp(11px,3vw,12px); font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; touch-action: manipulation; }
+  .chip:hover, .chip.active, .chip:active { border-color: rgba(168,85,247,0.4); background: rgba(168,85,247,0.1); color: var(--purple-light); }
   .chip.custom-kb { border-color: rgba(245,158,11,0.35); background: rgba(245,158,11,0.07); color: var(--gold); }
-  .chip.custom-kb:hover { border-color: rgba(245,158,11,0.6); background: rgba(245,158,11,0.14); }
-  .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
-  .feat-card { border-radius: var(--card-radius); border: 1px solid var(--border); background: var(--surface); padding: 18px 16px; cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden; backdrop-filter: blur(10px); }
+  .chip.custom-kb:hover, .chip.custom-kb:active { border-color: rgba(245,158,11,0.6); background: rgba(245,158,11,0.14); }
+
+  .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+  .feat-card { border-radius: var(--card-radius); border: 1px solid var(--border); background: var(--surface); padding: clamp(14px,4vw,18px) clamp(12px,4vw,16px); cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden; backdrop-filter: blur(10px); touch-action: manipulation; }
   .feat-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, var(--card-color, rgba(124,58,237,0.08)), transparent); opacity: 0; transition: opacity 0.25s; }
-  .feat-card:hover { transform: translateY(-3px); border-color: rgba(168,85,247,0.3); }
-  .feat-card:hover::before { opacity: 1; }
-  .feat-card.wide { grid-column: span 2; padding: 20px; }
-  .card-icon { font-size: 22px; margin-bottom: 10px; }
-  .card-label { font-family: var(--font-display); font-size: 13px; font-weight: 700; line-height: 1.3; margin-bottom: 4px; }
-  .card-sub { font-size: 11px; color: var(--muted); }
-  .card-arrow { position: absolute; top: 14px; right: 14px; font-size: 12px; color: var(--muted); }
+  .feat-card:hover, .feat-card:active { transform: translateY(-2px); border-color: rgba(168,85,247,0.3); }
+  .feat-card:hover::before, .feat-card:active::before { opacity: 1; }
+  .feat-card.wide { grid-column: span 2; padding: clamp(16px,4vw,20px); }
+  .card-icon { font-size: clamp(18px,5vw,22px); margin-bottom: 8px; }
+  .card-label { font-family: var(--font-display); font-size: clamp(12px,3.5vw,13px); font-weight: 700; line-height: 1.3; margin-bottom: 3px; }
+  .card-sub { font-size: clamp(10px,2.5vw,11px); color: var(--muted); }
+  .card-arrow { position: absolute; top: 12px; right: 12px; font-size: 12px; color: var(--muted); }
   .wide-card-inner { display: flex; align-items: center; gap: 14px; }
-  .wide-orb { width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0; background: conic-gradient(from 0deg, #3b82f6, #7c3aed, #ec4899, #a855f7, #06b6d4, #3b82f6); box-shadow: 0 0 20px rgba(124,58,237,0.6); position: relative; overflow: hidden; }
+  .wide-orb { width: clamp(40px,12vw,52px); height: clamp(40px,12vw,52px); border-radius: 50%; flex-shrink: 0; background: conic-gradient(from 0deg, #3b82f6, #7c3aed, #ec4899, #a855f7, #06b6d4, #3b82f6); box-shadow: 0 0 20px rgba(124,58,237,0.6); position: relative; overflow: hidden; }
   .wide-orb::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: repeating-conic-gradient(rgba(255,255,255,0.05) 0deg 10deg, transparent 10deg 20deg); animation: orb-swirl 8s linear infinite; }
-  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-  .section-title { font-family: var(--font-display); font-size: 15px; font-weight: 700; }
-  .see-all { font-size: 12px; color: var(--purple-light); cursor: pointer; }
+
+  .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .section-title { font-family: var(--font-display); font-size: clamp(13px,3.5vw,15px); font-weight: 700; }
+  .see-all { font-size: 12px; color: var(--purple-light); cursor: pointer; touch-action: manipulation; }
   .history-list { display: flex; flex-direction: column; gap: 8px; }
-  .history-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px); }
-  .history-item:hover { border-color: rgba(168,85,247,0.25); background: var(--surface2); }
-  .hist-icon { width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(59,130,246,0.2)); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .history-item { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px); touch-action: manipulation; }
+  .history-item:hover, .history-item:active { border-color: rgba(168,85,247,0.25); background: var(--surface2); }
+  .hist-icon { width: 34px; height: 34px; border-radius: 10px; flex-shrink: 0; background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(59,130,246,0.2)); display: flex; align-items: center; justify-content: center; font-size: 15px; }
   .hist-info { flex: 1; min-width: 0; }
-  .hist-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .hist-preview { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .hist-time { font-size: 11px; color: var(--muted); flex-shrink: 0; }
-  .bottom-nav { display: flex; align-items: center; justify-content: space-around; padding: 12px 16px 28px; border-top: 1px solid var(--border); background: rgba(7,6,15,0.92); backdrop-filter: blur(20px); position: relative; }
-  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 4px 12px; flex: 1; }
+  .hist-title { font-size: clamp(12px,3vw,13px); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hist-preview { font-size: clamp(10px,2.5vw,11px); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hist-time { font-size: clamp(10px,2.5vw,11px); color: var(--muted); flex-shrink: 0; }
+
+  /* ── BOTTOM NAV ── */
+  .bottom-nav { display: flex; align-items: center; justify-content: space-around; padding: 10px 16px env(safe-area-inset-bottom, 20px); border-top: 1px solid var(--border); background: rgba(7,6,15,0.95); backdrop-filter: blur(20px); position: relative; flex-shrink: 0; }
+  .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; padding: 4px 12px; flex: 1; touch-action: manipulation; }
   .nav-icon { font-size: 20px; transition: all 0.2s; }
   .nav-label { font-size: 10px; color: var(--muted); font-weight: 500; transition: all 0.2s; }
   .nav-item.active .nav-icon { filter: drop-shadow(0 0 8px var(--purple-light)); transform: scale(1.1); }
   .nav-item.active .nav-label { color: var(--purple-light); }
-  .nav-orb-btn { width: 52px; height: 52px; border-radius: 50%; background: conic-gradient(from 0deg, #3b82f6, #7c3aed, #ec4899, #a855f7, #06b6d4, #3b82f6); box-shadow: 0 0 24px rgba(124,58,237,0.7); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.25s; position: relative; overflow: hidden; margin-top: -24px; border: 2px solid rgba(255,255,255,0.15); }
+  .nav-orb-btn { width: 52px; height: 52px; border-radius: 50%; background: conic-gradient(from 0deg, #3b82f6, #7c3aed, #ec4899, #a855f7, #06b6d4, #3b82f6); box-shadow: 0 0 24px rgba(124,58,237,0.7); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.25s; position: relative; overflow: hidden; margin-top: -24px; border: 2px solid rgba(255,255,255,0.15); flex-shrink: 0; touch-action: manipulation; }
   .nav-orb-btn::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: repeating-conic-gradient(rgba(255,255,255,0.06) 0deg 10deg, transparent 10deg 20deg); animation: orb-swirl 8s linear infinite; }
-  .nav-orb-btn:hover { transform: scale(1.12) translateY(-2px); }
+  .nav-orb-btn:hover, .nav-orb-btn:active { transform: scale(1.1) translateY(-2px); }
   .nav-orb-inner { font-size: 20px; z-index: 1; position: relative; }
 
-  /* ── CHAT ── */
+  /* ════════════════════════════════
+     CHAT
+  ════════════════════════════════ */
   #chat { padding: 0; }
-  .chat-header { display: flex; align-items: center; gap: 12px; padding: 20px 20px 14px; border-bottom: 1px solid var(--border); }
-  .back-btn { width: 34px; height: 34px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: all 0.2s; flex-shrink: 0; }
-  .back-btn:hover { background: var(--surface2); }
-  .chat-title-group { flex: 1; }
-  .chat-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; }
-  .chat-sub { font-size: 11px; color: var(--muted); }
-  .chat-orb-small { width: 38px; height: 38px; border-radius: 50%; background: conic-gradient(from 0deg, #3b82f6, #7c3aed, #ec4899, #a855f7, #06b6d4, #3b82f6); box-shadow: 0 0 16px rgba(124,58,237,0.6); position: relative; overflow: hidden; flex-shrink: 0; animation: orb-swirl 8s linear infinite; }
+  .chat-header { display: flex; align-items: center; gap: 10px; padding: clamp(14px,4vw,20px) clamp(14px,4vw,20px) 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .back-btn { width: 34px; height: 34px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; transition: all 0.2s; flex-shrink: 0; touch-action: manipulation; }
+  .back-btn:hover, .back-btn:active { background: var(--surface2); }
+  .chat-title-group { flex: 1; min-width: 0; }
+  .chat-title { font-family: var(--font-display); font-size: clamp(14px,4vw,16px); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chat-sub { font-size: clamp(10px,2.5vw,11px); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chat-orb-small { width: 36px; height: 36px; border-radius: 50%; background: conic-gradient(from 0deg, #3b82f6, #7c3aed, #ec4899, #a855f7, #06b6d4, #3b82f6); box-shadow: 0 0 16px rgba(124,58,237,0.6); position: relative; overflow: hidden; flex-shrink: 0; animation: orb-swirl 8s linear infinite; }
   .chat-orb-small::after { content:''; position:absolute; inset:0; border-radius:50%; background:repeating-conic-gradient(rgba(255,255,255,0.06) 0deg 10deg, transparent 10deg 20deg); animation:orb-swirl 8s linear infinite; }
 
   .add-kb-btn {
@@ -222,148 +270,204 @@
     color: var(--gold); font-size: 22px; font-weight: 300;
     display: flex; align-items: center; justify-content: center;
     cursor: pointer; transition: transform .22s cubic-bezier(.34,1.56,.64,1), background .18s, box-shadow .18s;
-    line-height: 1;
+    line-height: 1; touch-action: manipulation;
   }
-  .add-kb-btn:hover {
+  .add-kb-btn:hover, .add-kb-btn:active {
     transform: rotate(90deg) scale(1.15);
     background: rgba(245,158,11,0.18);
     box-shadow: 0 0 16px rgba(245,158,11,0.35);
   }
 
-  .chat-messages { flex: 1; overflow-y: auto; padding: 20px 18px; display: flex; flex-direction: column; gap: 14px; }
+  .chat-messages { flex: 1; overflow-y: auto; padding: clamp(14px,4vw,20px) clamp(12px,4vw,18px); display: flex; flex-direction: column; gap: 12px; -webkit-overflow-scrolling: touch; }
   .chat-messages::-webkit-scrollbar { display: none; }
-  .msg { display: flex; gap: 10px; max-width: 88%; }
+  .msg { display: flex; gap: 8px; max-width: 88%; }
   .msg.user { align-self: flex-end; flex-direction: row-reverse; }
   .msg.bot { align-self: flex-start; }
-  .msg-avatar { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; background: conic-gradient(from 0deg, #3b82f6, #7c3aed, #ec4899, #a855f7, #06b6d4, #3b82f6); box-shadow: 0 0 10px rgba(124,58,237,0.5); display: flex; align-items: center; justify-content: center; font-size: 13px; overflow: hidden; position: relative; animation: orb-swirl 8s linear infinite; }
+  .msg-avatar { width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0; background: conic-gradient(from 0deg, #3b82f6, #7c3aed, #ec4899, #a855f7, #06b6d4, #3b82f6); box-shadow: 0 0 10px rgba(124,58,237,0.5); display: flex; align-items: center; justify-content: center; font-size: 12px; overflow: hidden; position: relative; animation: orb-swirl 8s linear infinite; }
   .msg-avatar::after { content:''; position:absolute; inset:0; border-radius:50%; background:repeating-conic-gradient(rgba(255,255,255,0.06) 0deg 10deg, transparent 10deg 20deg); animation:orb-swirl 8s linear infinite; }
-  .msg-bubble { padding: 12px 16px; border-radius: 18px; font-size: 13.5px; line-height: 1.55; }
+  .msg-bubble { padding: 11px 15px; border-radius: 18px; font-size: clamp(12.5px,3.5vw,13.5px); line-height: 1.55; }
   .msg.bot .msg-bubble { background: var(--surface2); border: 1px solid var(--border); border-bottom-left-radius: 4px; }
   .msg.user .msg-bubble { background: linear-gradient(135deg, var(--purple), #6d28d9); border-bottom-right-radius: 4px; box-shadow: 0 4px 20px rgba(124,58,237,0.35); }
+
   .typing-dots { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
   .typing-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--purple-light); animation: typing 1.2s ease-in-out infinite; }
   .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
   .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
   @keyframes typing { 0%,60%,100%{transform:translateY(0);opacity:0.4} 30%{transform:translateY(-6px);opacity:1} }
-  .chat-input-area { padding: 12px 16px 28px; border-top: 1px solid var(--border); background: rgba(7,6,15,0.9); backdrop-filter: blur(20px); }
-  .chat-input-row { display: flex; align-items: center; gap: 10px; }
-  .chat-input { flex: 1; padding: 13px 16px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--font-body); font-size: 14px; outline: none; transition: border-color 0.2s; backdrop-filter: blur(10px); }
+
+  /* RAG badge shown in bot responses */
+  .rag-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 2px 8px; border-radius: 100px; margin-top: 6px; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.25); color: #86efac; vertical-align: middle; }
+
+  .chat-input-area { padding: 10px clamp(12px,4vw,16px) env(safe-area-inset-bottom, 16px); border-top: 1px solid var(--border); background: rgba(7,6,15,0.95); backdrop-filter: blur(20px); flex-shrink: 0; }
+  .chat-input-row { display: flex; align-items: center; gap: 8px; }
+  .chat-input { flex: 1; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--font-body); font-size: clamp(13px,3.5vw,14px); outline: none; transition: border-color 0.2s; backdrop-filter: blur(10px); min-width: 0; }
   .chat-input::placeholder { color: var(--muted); }
   .chat-input:focus { border-color: rgba(168,85,247,0.4); }
-  .send-btn { width: 44px; height: 44px; border-radius: 12px; flex-shrink: 0; background: linear-gradient(135deg, var(--purple), var(--purple-light)); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: all 0.2s; box-shadow: 0 4px 16px rgba(124,58,237,0.4); }
-  .send-btn:hover { transform: scale(1.07); box-shadow: 0 6px 20px rgba(124,58,237,0.55); }
-  .feedback-bar { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-top: 1px solid var(--border); background: rgba(7,6,15,0.7); }
+  .send-btn { width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0; background: linear-gradient(135deg, var(--purple), var(--purple-light)); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: all 0.2s; box-shadow: 0 4px 16px rgba(124,58,237,0.4); touch-action: manipulation; }
+  .send-btn:hover, .send-btn:active { transform: scale(1.07); box-shadow: 0 6px 20px rgba(124,58,237,0.55); }
+
+  .feedback-bar { display: flex; align-items: center; gap: 8px; padding: 8px clamp(12px,4vw,16px); border-top: 1px solid var(--border); background: rgba(7,6,15,0.7); flex-shrink: 0; }
   .feedback-bar span { font-size: 11px; color: var(--muted); flex: 1; }
-  .fb-btn { background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-size: 14px; padding: 4px 10px; cursor: pointer; transition: all 0.2s; }
-  .fb-btn:hover { background: var(--surface2); color: var(--text); }
+  .fb-btn { background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--muted); font-size: 14px; padding: 4px 10px; cursor: pointer; transition: all 0.2s; touch-action: manipulation; }
+  .fb-btn:hover, .fb-btn:active { background: var(--surface2); color: var(--text); }
   .fb-btn.active-pos { border-color: #22c55e; color: #22c55e; background: rgba(34,197,94,0.1); }
   .fb-btn.active-neg { border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,0.1); }
 
-  /* ── HISTORY VIEW ── */
+  /* ════════════════════════════════
+     HISTORY VIEW
+  ════════════════════════════════ */
   #history { padding: 0; }
-  .history-header { display: flex; align-items: center; gap: 12px; padding: 20px 20px 14px; border-bottom: 1px solid var(--border); }
-  .history-title { font-family: var(--font-display); font-size: 17px; font-weight: 800; flex: 1; }
-  #historyList { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .history-header { display: flex; align-items: center; gap: 12px; padding: clamp(14px,4vw,20px) clamp(14px,4vw,20px) 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .history-title { font-family: var(--font-display); font-size: clamp(15px,4vw,17px); font-weight: 800; flex: 1; }
+  #historyList { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
   #historyList::-webkit-scrollbar { display: none; }
-  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
-  .empty-state div { font-size: 40px; margin-bottom: 12px; }
-  .empty-state p { font-size: 14px; }
+  .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
+  .empty-state div { font-size: 36px; margin-bottom: 12px; }
+  .empty-state p { font-size: clamp(12px,3vw,14px); line-height: 1.5; }
 
-  /* ── KB VIEW ── */
+  /* ════════════════════════════════
+     KB VIEW
+  ════════════════════════════════ */
   #kbView { padding: 0; }
-  .kb-view-header { display: flex; align-items: center; gap: 12px; padding: 20px 20px 14px; border-bottom: 1px solid var(--border); }
-  .kb-view-title { font-family: var(--font-display); font-size: 17px; font-weight: 800; flex: 1; }
-  #kbViewList { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+  .kb-view-header { display: flex; align-items: center; gap: 12px; padding: clamp(14px,4vw,20px) clamp(14px,4vw,20px) 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .kb-view-title { font-family: var(--font-display); font-size: clamp(15px,4vw,17px); font-weight: 800; flex: 1; }
+  #kbViewList { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
   #kbViewList::-webkit-scrollbar { display: none; }
-  .kb-entry { padding: 14px 16px; border-radius: 16px; border: 1px solid rgba(245,158,11,0.2); background: rgba(245,158,11,0.04); position: relative; transition: border-color .18s; }
+  .kb-entry { padding: 13px 15px; border-radius: 16px; border: 1px solid rgba(245,158,11,0.2); background: rgba(245,158,11,0.04); position: relative; transition: border-color .18s; padding-right: 70px; }
   .kb-entry:hover { border-color: rgba(245,158,11,0.4); }
   .kb-entry-topic { font-size: 10px; text-transform: uppercase; letter-spacing: .7px; color: var(--gold); font-weight: 700; margin-bottom: 5px; }
-  .kb-entry-q { font-size: 13px; color: var(--text); font-weight: 600; margin-bottom: 4px; }
-  .kb-entry-a { font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .kb-entry-q { font-size: clamp(12px,3vw,13px); color: var(--text); font-weight: 600; margin-bottom: 4px; }
+  .kb-entry-a { font-size: clamp(11px,2.5vw,12px); color: var(--muted); line-height: 1.5; }
   .kb-entry-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 3px 9px; border-radius: 100px; margin-top: 8px; background: rgba(124,58,237,0.15); border: 1px solid rgba(168,85,247,0.2); color: var(--purple-light); }
-  .kb-entry-del { position: absolute; top: 10px; right: 10px; background: none; border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; color: rgba(239,68,68,0.6); font-size: 13px; padding: 3px 8px; cursor: pointer; transition: all .15s; }
-  .kb-entry-del:hover { background: rgba(239,68,68,0.12); color: #ef4444; border-color: rgba(239,68,68,0.5); }
-  .kb-add-btn-row { padding: 0 16px 16px; }
-  .kb-add-btn { width: 100%; padding: 13px; border-radius: 13px; border: 1px dashed rgba(245,158,11,0.4); background: rgba(245,158,11,0.04); color: var(--gold); font-family: var(--font-display); font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .kb-add-btn:hover { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.6); }
+  .kb-entry-del { position: absolute; top: 10px; right: 10px; background: none; border: 1px solid rgba(239,68,68,0.25); border-radius: 8px; color: rgba(239,68,68,0.6); font-size: 12px; padding: 4px 8px; cursor: pointer; transition: all .15s; white-space: nowrap; touch-action: manipulation; }
+  .kb-entry-del:hover, .kb-entry-del:active { background: rgba(239,68,68,0.12); color: #ef4444; border-color: rgba(239,68,68,0.5); }
 
-  /* ── ADD KB MODAL ── */
-  #kbModal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(.88); width: min(420px, 94vw); background: rgba(12,10,22,0.99); border-radius: 24px; border: 1px solid rgba(245,158,11,0.2); box-shadow: 0 24px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(245,158,11,0.08); z-index: 201; opacity: 0; pointer-events: none; transition: all .28s cubic-bezier(.34,1.56,.64,1); overflow: hidden; }
+  .kb-add-btn-row { padding: 12px 14px 6px; flex-shrink: 0; }
+  .kb-add-btn { width: 100%; padding: 12px; border-radius: 13px; border: 1px dashed rgba(245,158,11,0.4); background: rgba(245,158,11,0.04); color: var(--gold); font-family: var(--font-display); font-size: clamp(12px,3vw,13px); font-weight: 700; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 8px; touch-action: manipulation; }
+  .kb-add-btn:hover, .kb-add-btn:active { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.6); }
+
+  /* ════════════════════════════════
+     ADD KB MODAL
+  ════════════════════════════════ */
+  #kbModal {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(.88);
+    width: min(460px, 96vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    background: rgba(12,10,22,0.99);
+    border-radius: 24px;
+    border: 1px solid rgba(245,158,11,0.2);
+    box-shadow: 0 24px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(245,158,11,0.08);
+    z-index: 201; opacity: 0; pointer-events: none;
+    transition: all .28s cubic-bezier(.34,1.56,.64,1);
+    -webkit-overflow-scrolling: touch;
+  }
   #kbModal.open { opacity: 1; pointer-events: all; transform: translate(-50%, -50%) scale(1); }
-  .kb-modal-header { padding: 22px 22px 16px; background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(124,58,237,0.12)); border-bottom: 1px solid rgba(245,158,11,0.15); display: flex; align-items: flex-start; justify-content: space-between; }
-  .kb-modal-header h2 { font-family: var(--font-display); font-size: 18px; font-weight: 800; color: var(--text); }
-  .kb-modal-header p { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
-  .kb-modal-close { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; width: 30px; height: 30px; color: var(--muted); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; }
-  .kb-modal-close:hover { background: rgba(255,255,255,0.14); color: var(--text); }
-  .kb-modal-body { padding: 18px 20px 6px; display: flex; flex-direction: column; gap: 13px; }
+  #kbModal::-webkit-scrollbar { display: none; }
+
+  .kb-modal-header { padding: 20px 20px 14px; background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(124,58,237,0.12)); border-bottom: 1px solid rgba(245,158,11,0.15); display: flex; align-items: flex-start; justify-content: space-between; position: sticky; top: 0; z-index: 1; backdrop-filter: blur(10px); }
+  .kb-modal-header h2 { font-family: var(--font-display); font-size: clamp(15px,4vw,18px); font-weight: 800; color: var(--text); }
+  .kb-modal-header p { font-size: clamp(10px,2.5vw,11.5px); color: var(--muted); margin-top: 3px; }
+  .kb-modal-close { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; width: 30px; height: 30px; color: var(--muted); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; flex-shrink: 0; touch-action: manipulation; }
+  .kb-modal-close:hover, .kb-modal-close:active { background: rgba(255,255,255,0.14); color: var(--text); }
+
+  .kb-modal-body { padding: 16px 18px 6px; display: flex; flex-direction: column; gap: 12px; }
   .kb-field { display: flex; flex-direction: column; gap: 5px; }
   .kb-field label { font-size: 10.5px; font-weight: 600; color: rgba(245,158,11,0.8); text-transform: uppercase; letter-spacing: .6px; }
-  .kb-field input, .kb-field textarea, .kb-field select { padding: 11px 13px; border: 1px solid rgba(255,255,255,0.08); border-radius: 11px; font-family: var(--font-body); font-size: 13.5px; color: var(--text); background: rgba(255,255,255,0.04); outline: none; transition: border-color .2s, background .2s; }
+  .kb-field input, .kb-field textarea, .kb-field select {
+    padding: 10px 12px; border: 1px solid rgba(255,255,255,0.08); border-radius: 11px;
+    font-family: var(--font-body); font-size: clamp(13px,3.5vw,13.5px); color: var(--text);
+    background: rgba(255,255,255,0.04); outline: none; transition: border-color .2s, background .2s;
+    -webkit-appearance: none;
+  }
   .kb-field input:focus, .kb-field textarea:focus, .kb-field select:focus { border-color: rgba(245,158,11,0.45); background: rgba(255,255,255,0.07); }
   .kb-field input::placeholder, .kb-field textarea::placeholder { color: var(--muted); }
-  .kb-field textarea { min-height: 90px; line-height: 1.55; resize: vertical; }
+  .kb-field textarea { min-height: 80px; line-height: 1.55; resize: vertical; }
   .kb-field select option { background: #1a1530; color: var(--text); }
   .kb-hint { font-size: 11px; color: var(--muted); }
-  .kb-modal-footer { padding: 14px 20px 20px; display: flex; gap: 10px; justify-content: flex-end; }
-  .kb-btn-cancel { padding: 10px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: none; color: var(--muted); font-family: var(--font-body); font-size: 13px; cursor: pointer; transition: all .18s; }
-  .kb-btn-cancel:hover { background: var(--surface2); color: var(--text); }
-  .kb-btn-save { padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(135deg, rgba(245,158,11,0.9), rgba(245,158,11,0.65)); color: #1a0f00; font-family: var(--font-display); font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 16px rgba(245,158,11,0.25); transition: all .18s; display: flex; align-items: center; gap: 6px; }
-  .kb-btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(245,158,11,0.38); }
+
+  .kb-modal-footer { padding: 12px 18px 18px; display: flex; gap: 10px; justify-content: flex-end; position: sticky; bottom: 0; background: rgba(12,10,22,0.95); border-top: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(10px); }
+  .kb-btn-cancel { padding: 10px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); background: none; color: var(--muted); font-family: var(--font-body); font-size: 13px; cursor: pointer; transition: all .18s; touch-action: manipulation; }
+  .kb-btn-cancel:hover, .kb-btn-cancel:active { background: var(--surface2); color: var(--text); }
+  .kb-btn-save { padding: 10px 20px; border-radius: 10px; border: none; background: linear-gradient(135deg, rgba(245,158,11,0.9), rgba(245,158,11,0.65)); color: #1a0f00; font-family: var(--font-display); font-size: 13px; font-weight: 800; cursor: pointer; box-shadow: 0 4px 16px rgba(245,158,11,0.25); transition: all .18s; display: flex; align-items: center; gap: 6px; white-space: nowrap; touch-action: manipulation; }
+  .kb-btn-save:hover, .kb-btn-save:active { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(245,158,11,0.38); }
   .kb-btn-save:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 
   /* ── MENU OVERLAY ── */
   .overlay { display: none; position: fixed; inset: 0; background: rgba(7,6,15,0.7); backdrop-filter: blur(8px); z-index: 50; align-items: flex-start; justify-content: flex-start; }
   .overlay.open { display: flex; }
-  .menu-panel { width: 280px; height: 100%; background: rgba(12,10,20,0.97); border-right: 1px solid var(--border); padding: 0; display: flex; flex-direction: column; animation: slide-in 0.3s ease; overflow-y: auto; }
+  .menu-panel { width: min(280px, 80vw); height: 100%; background: rgba(12,10,20,0.97); border-right: 1px solid var(--border); padding: 0; display: flex; flex-direction: column; animation: slide-in 0.3s ease; overflow-y: auto; -webkit-overflow-scrolling: touch; }
   @keyframes slide-in { from{transform:translateX(-100%)} to{transform:translateX(0)} }
-  .menu-profile { padding: 40px 20px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .menu-profile { padding: clamp(32px,8vw,40px) 18px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
   .menu-avatar { width: 44px; height: 44px; border-radius: 50%; overflow: hidden; background: linear-gradient(135deg, var(--purple), var(--blue)); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
   .menu-avatar img { width:100%; height:100%; object-fit:cover; }
-  .menu-user-name { font-family: var(--font-display); font-size: 14px; font-weight: 700; }
-  .menu-user-email { font-size: 11px; color: var(--muted); margin-top: 2px; }
-  .menu-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
-  .menu-section-label { font-family: var(--font-display); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 12px 10px 6px; }
-  .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-size: 14px; color: var(--muted); }
-  .menu-item:hover { background: var(--surface2); color: var(--text); }
-  .menu-item.danger:hover { background: rgba(239,68,68,0.1); color: #ef4444; }
-  .menu-item.gold-item:hover { background: rgba(245,158,11,0.1); color: var(--gold); }
+  .menu-user-name { font-family: var(--font-display); font-size: clamp(13px,3.5vw,14px); font-weight: 700; word-break: break-word; }
+  .menu-user-email { font-size: clamp(10px,2.5vw,11px); color: var(--muted); margin-top: 2px; word-break: break-all; }
+  .menu-body { padding: 14px; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+  .menu-section-label { font-family: var(--font-display); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 10px 10px 5px; }
+  .menu-item { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border-radius: 12px; cursor: pointer; transition: all 0.2s; font-size: clamp(13px,3.5vw,14px); color: var(--muted); touch-action: manipulation; }
+  .menu-item:hover, .menu-item:active { background: var(--surface2); color: var(--text); }
+  .menu-item.danger:hover, .menu-item.danger:active { background: rgba(239,68,68,0.1); color: #ef4444; }
+  .menu-item.gold-item:hover, .menu-item.gold-item:active { background: rgba(245,158,11,0.1); color: var(--gold); }
   .menu-icon { font-size: 18px; }
 
-  /* ── GENERAL MODAL OVERLAY ── */
+  /* ── MODAL BG ── */
   #modalBg { display: none; position: fixed; inset: 0; background: rgba(7,6,15,0.85); backdrop-filter: blur(10px); z-index: 200; }
   #modalBg.open { display: block; }
 
+  /* ── ANIMATIONS ── */
   .fade-up { opacity: 0; transform: translateY(20px); animation: fade-up 0.6s ease forwards; }
   @keyframes fade-up { to{opacity:1;transform:translateY(0)} }
 
-  .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(10px); background: rgba(30,20,50,0.97); border: 1px solid var(--border); border-radius: 12px; padding: 10px 20px; font-size: 13px; color: var(--text); backdrop-filter: blur(16px); z-index: 300; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; white-space: nowrap; }
+  /* ── TOAST ── */
+  .toast { position: fixed; bottom: env(safe-area-inset-bottom, 100px); bottom: calc(env(safe-area-inset-bottom, 0px) + 90px); left: 50%; transform: translateX(-50%) translateY(10px); background: rgba(30,20,50,0.97); border: 1px solid var(--border); border-radius: 12px; padding: 10px 18px; font-size: clamp(11px,3vw,13px); color: var(--text); backdrop-filter: blur(16px); z-index: 300; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .toast.success { border-color: rgba(34,197,94,0.3); background: rgba(15,40,20,0.97); }
   .toast.error   { border-color: rgba(239,68,68,0.3); background: rgba(40,10,10,0.97); }
+
+  /* ── NLP CONFIDENCE INDICATOR ── */
+  .nlp-hint { font-size: 10px; color: var(--muted); text-align: center; padding: 4px 0 8px; display: none; }
+  .nlp-hint.show { display: block; }
+
+  /* Wide screen — center everything */
+  @media (min-width: 520px) {
+    .bg-canvas::before {
+      background:
+        radial-gradient(ellipse 40% 50% at 30% 20%, rgba(124,58,237,0.14) 0%, transparent 70%),
+        radial-gradient(ellipse 35% 50% at 70% 70%, rgba(59,130,246,0.1) 0%, transparent 70%);
+    }
+  }
+
+  /* Ensure inputs don't zoom on iOS */
+  @media (max-width: 480px) {
+    input, textarea, select { font-size: 16px !important; }
+  }
 </style>
 </head>
 <body>
 
 <div class="bg-canvas"><div class="grid-lines"></div></div>
 
+<div class="app-shell">
+
 <!-- ════════ LANDING ════════ -->
 <div class="view active" id="landing">
-  <div class="app" style="justify-content:space-between; padding:40px 28px 32px; align-items:center; text-align:center">
-    <div class="brand-tag fade-up" style="animation-delay:0.1s">🌺 Iloilo AI Travel Guide</div>
-    <div class="orb-wrapper fade-up" style="animation-delay:0.3s">
-      <div class="orb-rings"></div>
-      <div class="orb-pulse"></div>
-      <div class="orb"><div class="orb-inner"><div class="orb-band"></div><div class="orb-band"></div></div></div>
-    </div>
-    <div class="hero-text fade-up" style="animation-delay:0.5s">
-      <h1>How may I<br><span>help you</span> today?</h1>
-      <p>Your AI-powered guide to exploring the beautiful city of Iloilo.</p>
-    </div>
-    <div class="landing-actions fade-up" style="animation-delay:0.7s">
-      <button class="btn-primary" onclick="openSignInModal()">🚀 Get Started</button>
-      <button class="btn-guest" onclick="startAsGuest()">Continue as Guest</button>
-      <button class="btn-admin" onclick="window.open('admin.html','_blank')">🛡️ Admin Portal</button>
-    </div>
+  <div class="brand-tag fade-up" style="animation-delay:0.1s">🌺 Iloilo AI Travel Guide</div>
+  <div class="orb-wrapper fade-up" style="animation-delay:0.3s">
+    <div class="orb-rings"></div>
+    <div class="orb-pulse"></div>
+    <div class="orb"><div class="orb-inner"><div class="orb-band"></div><div class="orb-band"></div></div></div>
+  </div>
+  <div class="hero-text fade-up" style="animation-delay:0.5s">
+    <h1>How may I<br><span>help you</span> today?</h1>
+    <p>Your AI-powered guide to exploring the beautiful city of Iloilo.</p>
+  </div>
+  <div class="landing-actions fade-up" style="animation-delay:0.7s">
+    <button class="btn-primary" onclick="openSignInModal()">🚀 Get Started</button>
+    <button class="btn-guest" onclick="startAsGuest()">Continue as Guest</button>
+    <button class="btn-admin" onclick="window.open('admin.html','_blank')">🛡️ Admin Portal</button>
   </div>
 </div>
 
@@ -372,7 +476,7 @@
   <div class="modal-card">
     <div class="modal-orb"></div>
     <h2>Sign in to Continue</h2>
-    <p>Use your Google account to save your chat history, sessions, and personalize your Iloilo travel experience.</p>
+    <p>Use your Google account to save your chat history and personalize your Iloilo travel experience.</p>
     <button class="btn-google" id="googleSignInBtn" onclick="handleGoogleSignIn()">
       <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="rgba(255,255,255,0.8)" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="rgba(255,255,255,0.6)" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="rgba(255,255,255,0.4)" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
       Continue with Google
@@ -384,121 +488,113 @@
 
 <!-- ════════ HOME ════════ -->
 <div class="view" id="home">
-  <div class="app" style="padding:0; overflow:hidden">
-    <div class="home-header">
-      <div class="menu-btn" onclick="openMenu()"><span></span><span></span><span></span></div>
-      <div class="status-badge"><div class="status-dot"></div> Online</div>
-      <div class="avatar-btn" id="homeAvatar">👤</div>
+  <div class="home-header">
+    <div class="menu-btn" onclick="openMenu()"><span></span><span></span><span></span></div>
+    <div class="status-badge"><div class="status-dot"></div> Online</div>
+    <div class="avatar-btn" id="homeAvatar">👤</div>
+  </div>
+  <div class="home-scroll">
+    <div class="greeting">
+      <div class="sub">Good day! 🌺</div>
+      <h2>How may I <span>help you</span> today?</h2>
     </div>
-    <div class="home-scroll">
-      <div class="greeting">
-        <div class="sub">Good day! 🌺</div>
-        <h2>How may I <span>help you</span> today?</h2>
-      </div>
-      <div class="home-orb-container" onclick="goChat()">
-        <div class="home-orb"><div class="home-orb-inner"></div></div>
-      </div>
-      <div class="quick-input-wrap">
-        <input class="quick-input" id="quickInput" placeholder="Ask me about Iloilo..." onkeydown="if(event.key==='Enter')goChat(this.value)" />
-        <div class="quick-input-icon" onclick="goChat(document.getElementById('quickInput').value)">➤</div>
-      </div>
-      <div class="chips-row" id="homeChips">
-        <div class="chip active" onclick="goChat()">🗺️ All</div>
-        <div class="chip" onclick="goChat('Best tourist spots in Iloilo')">🏖️ Spots</div>
-        <div class="chip" onclick="goChat('Best local food in Iloilo')">🍜 Food</div>
-        <div class="chip" onclick="goChat('Best hotels in Iloilo')">🏨 Hotels</div>
-        <div class="chip" onclick="goChat('Transport options in Iloilo')">🚌 Transport</div>
-        <div class="chip" onclick="goChat('Events and festivals in Iloilo')">🎉 Events</div>
-      </div>
-      <div class="cards-grid">
-        <div class="feat-card wide" onclick="goChat()" style="--card-color:rgba(168,85,247,0.12)">
-          <div class="card-arrow">↗</div>
-          <div class="wide-card-inner">
-            <div class="wide-orb"></div>
-            <div><div class="card-label">Talk with AI Guide</div><div class="card-sub">Ask anything about Iloilo travel</div></div>
-          </div>
+    <div class="home-orb-container" onclick="goChat()">
+      <div class="home-orb"><div class="home-orb-inner"></div></div>
+    </div>
+    <div class="quick-input-wrap">
+      <input class="quick-input" id="quickInput" placeholder="Ask me about Iloilo..." onkeydown="if(event.key==='Enter')goChat(this.value)" />
+      <div class="quick-input-icon" onclick="goChat(document.getElementById('quickInput').value)">➤</div>
+    </div>
+    <div class="chips-row" id="homeChips">
+      <div class="chip active" onclick="goChat()">🗺️ All</div>
+      <div class="chip" onclick="goChat('Best tourist spots in Iloilo')">🏖️ Spots</div>
+      <div class="chip" onclick="goChat('Best local food in Iloilo')">🍜 Food</div>
+      <div class="chip" onclick="goChat('Best hotels in Iloilo')">🏨 Hotels</div>
+      <div class="chip" onclick="goChat('Transport options in Iloilo')">🚌 Transport</div>
+      <div class="chip" onclick="goChat('Events and festivals in Iloilo')">🎉 Events</div>
+    </div>
+    <div class="cards-grid">
+      <div class="feat-card wide" onclick="goChat()" style="--card-color:rgba(168,85,247,0.12)">
+        <div class="card-arrow">↗</div>
+        <div class="wide-card-inner">
+          <div class="wide-orb"></div>
+          <div><div class="card-label">Talk with AI Guide</div><div class="card-sub">Ask anything about Iloilo travel</div></div>
         </div>
-        <div class="feat-card" onclick="goChat('Best tourist spots in Iloilo')" style="--card-color:rgba(59,130,246,0.12)"><div class="card-arrow">↗</div><div class="card-icon">🏛️</div><div class="card-label">Tourist Spots</div><div class="card-sub">Must-see places</div></div>
-        <div class="feat-card" onclick="goChat('Best local food in Iloilo')" style="--card-color:rgba(236,72,153,0.12)"><div class="card-arrow">↗</div><div class="card-icon">🍜</div><div class="card-label">Food Guide</div><div class="card-sub">Local cuisine picks</div></div>
-        <div class="feat-card" onclick="goChat('Best hotels in Iloilo')" style="--card-color:rgba(6,182,212,0.12)"><div class="card-arrow">↗</div><div class="card-icon">🏨</div><div class="card-label">Hotels</div><div class="card-sub">Best stays in the city</div></div>
-        <div class="feat-card" onclick="goChat('Festivals and events in Iloilo')" style="--card-color:rgba(245,158,11,0.12)"><div class="card-arrow">↗</div><div class="card-icon">🎉</div><div class="card-label">Events</div><div class="card-sub">Festivals & happenings</div></div>
       </div>
-      <div class="section-header">
-        <span class="section-title">Recent Chats</span>
-        <span class="see-all" onclick="showView('history');closeMenuDirect()">See all</span>
-      </div>
-      <div class="history-list" id="homeRecentChats">
-        <div class="empty-state" style="padding:20px 0"><p style="font-size:12px">No recent chats yet. Start a conversation!</p></div>
-      </div>
+      <div class="feat-card" onclick="goChat('Best tourist spots in Iloilo')" style="--card-color:rgba(59,130,246,0.12)"><div class="card-arrow">↗</div><div class="card-icon">🏛️</div><div class="card-label">Tourist Spots</div><div class="card-sub">Must-see places</div></div>
+      <div class="feat-card" onclick="goChat('Best local food in Iloilo')" style="--card-color:rgba(236,72,153,0.12)"><div class="card-arrow">↗</div><div class="card-icon">🍜</div><div class="card-label">Food Guide</div><div class="card-sub">Local cuisine picks</div></div>
+      <div class="feat-card" onclick="goChat('Best hotels in Iloilo')" style="--card-color:rgba(6,182,212,0.12)"><div class="card-arrow">↗</div><div class="card-icon">🏨</div><div class="card-label">Hotels</div><div class="card-sub">Best stays in the city</div></div>
+      <div class="feat-card" onclick="goChat('Festivals and events in Iloilo')" style="--card-color:rgba(245,158,11,0.12)"><div class="card-arrow">↗</div><div class="card-icon">🎉</div><div class="card-label">Events</div><div class="card-sub">Festivals & happenings</div></div>
     </div>
-    <div class="bottom-nav">
-      <div class="nav-item" style="visibility:hidden; flex:1"></div>
-      <div class="nav-item active" id="navHome" onclick="showView('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
-      <div class="nav-orb-btn" onclick="goChat()"><div class="nav-orb-inner">✦</div></div>
-      <div class="nav-item" id="navChat" onclick="goChat()"><div class="nav-icon">💬</div><div class="nav-label">Chat</div></div>
-      <div class="nav-item" style="visibility:hidden; flex:1"></div>
+    <div class="section-header">
+      <span class="section-title">Recent Chats</span>
+      <span class="see-all" onclick="showView('history');closeMenuDirect()">See all</span>
     </div>
+    <div class="history-list" id="homeRecentChats">
+      <div class="empty-state" style="padding:16px 0"><p style="font-size:12px">No recent chats yet. Start a conversation!</p></div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item" style="visibility:hidden; flex:1"></div>
+    <div class="nav-item active" id="navHome" onclick="showView('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></div>
+    <div class="nav-orb-btn" onclick="goChat()"><div class="nav-orb-inner">✦</div></div>
+    <div class="nav-item" id="navChat" onclick="goChat()"><div class="nav-icon">💬</div><div class="nav-label">Chat</div></div>
+    <div class="nav-item" style="visibility:hidden; flex:1"></div>
   </div>
 </div>
 
 <!-- ════════ CHAT VIEW ════════ -->
 <div class="view" id="chat">
-  <div class="app" style="padding:0">
-    <div class="chat-header">
-      <div class="back-btn" onclick="showView('home')">←</div>
-      <div class="chat-title-group">
-        <div class="chat-title">Iloilo AI Guide</div>
-        <div class="chat-sub" id="chatSubtitle">Powered by Llama 3.3 70B · Online</div>
-      </div>
-      <button class="add-kb-btn" id="addKbBtn" title="Add knowledge to the AI">＋</button>
-      <div class="chat-orb-small"></div>
+  <div class="chat-header">
+    <div class="back-btn" onclick="showView('home')">←</div>
+    <div class="chat-title-group">
+      <div class="chat-title">Iloilo AI Guide</div>
+      <div class="chat-sub" id="chatSubtitle">Powered by Llama 3.3 70B · Online</div>
     </div>
-    <div class="chat-messages" id="chatMessages">
-      <div class="msg bot">
-        <div class="msg-avatar"></div>
-        <div class="msg-bubble">Maayong aga! 🌺 I'm your Iloilo AI Travel Guide. Ask me anything about tourist spots, food, hotels, transport, or events in Iloilo City!</div>
-      </div>
+    <button class="add-kb-btn" id="addKbBtn" title="Add knowledge to the AI">＋</button>
+    <div class="chat-orb-small"></div>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+    <div class="msg bot">
+      <div class="msg-avatar"></div>
+      <div class="msg-bubble">Maayong aga! 🌺 I'm your Iloilo AI Travel Guide. Ask me anything about tourist spots, food, hotels, transport, or events in Iloilo City!</div>
     </div>
-    <div class="feedback-bar" id="feedbackBar" style="display:none">
-      <span>Was this helpful?</span>
-      <button class="fb-btn" id="fbThumbUp" onclick="submitFeedback('positive')">👍</button>
-      <button class="fb-btn" id="fbThumbDown" onclick="submitFeedback('negative')">👎</button>
-    </div>
-    <div class="chat-input-area">
-      <div class="chat-input-row">
-        <input class="chat-input" id="chatInput" placeholder="Write a message..." onkeydown="if(event.key==='Enter')sendMsg()" />
-        <button class="send-btn" onclick="sendMsg()">➤</button>
-      </div>
+  </div>
+  <div class="feedback-bar" id="feedbackBar" style="display:none">
+    <span>Was this helpful?</span>
+    <button class="fb-btn" id="fbThumbUp" onclick="submitFeedback('positive')">👍</button>
+    <button class="fb-btn" id="fbThumbDown" onclick="submitFeedback('negative')">👎</button>
+  </div>
+  <div class="chat-input-area">
+    <div class="chat-input-row">
+      <input class="chat-input" id="chatInput" placeholder="Write a message..." onkeydown="if(event.key==='Enter')sendMsg()" />
+      <button class="send-btn" onclick="sendMsg()">➤</button>
     </div>
   </div>
 </div>
 
 <!-- ════════ HISTORY VIEW ════════ -->
 <div class="view" id="history">
-  <div class="app" style="padding:0">
-    <div class="history-header">
-      <div class="back-btn" onclick="showView('home')">←</div>
-      <div class="history-title">Chat History</div>
-    </div>
-    <div id="historyList">
-      <div class="empty-state"><div>💬</div><p>No chat history yet.<br>Start a conversation!</p></div>
-    </div>
+  <div class="history-header">
+    <div class="back-btn" onclick="showView('home')">←</div>
+    <div class="history-title">Chat History</div>
+  </div>
+  <div id="historyList">
+    <div class="empty-state"><div>💬</div><p>No chat history yet.<br>Start a conversation!</p></div>
   </div>
 </div>
 
 <!-- ════════ KB VIEW ════════ -->
 <div class="view" id="kbView">
-  <div class="app" style="padding:0">
-    <div class="kb-view-header">
-      <div class="back-btn" onclick="showView('home')">←</div>
-      <div class="kb-view-title">📚 Knowledge Base</div>
-    </div>
-    <div class="kb-add-btn-row">
-      <button class="kb-add-btn" onclick="openKbModal()">＋ Add New Knowledge Entry</button>
-    </div>
-    <div id="kbViewList">
-      <div class="empty-state"><div>📚</div><p>No custom entries yet.<br>Tap ＋ to add your first one!</p></div>
-    </div>
+  <div class="kb-view-header">
+    <div class="back-btn" onclick="showView('home')">←</div>
+    <div class="kb-view-title">📚 Knowledge Base</div>
+  </div>
+  <div class="kb-add-btn-row">
+    <button class="kb-add-btn" onclick="openKbModal()">＋ Add New Knowledge Entry</button>
+  </div>
+  <div id="kbViewList">
+    <div class="empty-state"><div>📚</div><p>No custom entries yet.<br>Tap ＋ to add your first one!</p></div>
   </div>
 </div>
 
@@ -531,25 +627,30 @@
   <div class="kb-modal-header">
     <div>
       <h2>✦ Add to Knowledge Base</h2>
-      <p>Teach the AI new knowledge — saved to Firebase &amp; active instantly</p>
+      <p>Teach the AI new knowledge — shared with all users instantly</p>
     </div>
     <button class="kb-modal-close" onclick="closeKbModal()">✕</button>
   </div>
   <div class="kb-modal-body">
     <div class="kb-field">
       <label>Topic / Keyword</label>
-      <input type="text" id="kbTopic" placeholder="e.g. Dinagyang, Esplanade, Molo Church" maxlength="60" />
-      <span class="kb-hint">🔍 Used to match user questions via RAG</span>
+      <input type="text" id="kbTopic" placeholder="e.g. Dinagyang, Esplanade, Molo Church" maxlength="80" />
+      <span class="kb-hint">🔍 Used to match user questions via NLP+RAG</span>
     </div>
     <div class="kb-field">
       <label>Trigger Question</label>
-      <input type="text" id="kbQuestion" placeholder="e.g. What is the Dinagyang Festival?" maxlength="160" />
+      <input type="text" id="kbQuestion" placeholder="e.g. What is the Dinagyang Festival?" maxlength="200" />
       <span class="kb-hint">💬 What a user might ask to get this answer</span>
     </div>
     <div class="kb-field">
       <label>Answer / Knowledge</label>
       <textarea id="kbAnswer" placeholder="e.g. The Dinagyang Festival is held every 4th Sunday of January in Iloilo City..."></textarea>
       <span class="kb-hint">💡 The knowledge the AI will use when answering</span>
+    </div>
+    <div class="kb-field">
+      <label>Aliases / Keywords (comma separated)</label>
+      <input type="text" id="kbAliases" placeholder="e.g. dinagyang, festival iloilo, ati-atihan iloilo" maxlength="300" />
+      <span class="kb-hint">🔗 Extra keywords to help NLP matching find this entry</span>
     </div>
     <div class="kb-field">
       <label>Category</label>
@@ -570,429 +671,607 @@
   </div>
 </div>
 
+</div><!-- /app-shell -->
+
 <div class="toast" id="toast"></div>
 
 <script>
-  /* ══ CONFIG ══ */
-  const GROQ_MODEL = 'llama-3.3-70b-versatile';
+'use strict';
 
-  const BASE_SYSTEM = 'You are a friendly and knowledgeable AI travel guide for Iloilo City, Philippines. You speak warmly and helpfully, sometimes using Ilonggo greetings like "Maayong aga" or "Kamusta". Keep answers concise and practical. Focus on tourist spots, food, hotels, transport, and local events in Iloilo. IMPORTANT: If the user asks about a topic that is covered in the "Additional local knowledge" section provided to you, you MUST use that information in your answer and do NOT make up or hallucinate information that contradicts it.';
+/* ══════════════════════════════════════
+   CONFIG
+══════════════════════════════════════ */
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
-  /* ══ STATE ══ */
-  let currentUser = null;
-  let isGuest = false;
-  let currentSessionId = null;
-  let currentChatMessages = [{ role: 'system', content: BASE_SYSTEM }];
-  let lastBotReply = null;
-  let dynamicKB = [];
+const BASE_SYSTEM = `You are a friendly and knowledgeable AI travel guide for Iloilo City, Philippines. You speak warmly and helpfully, sometimes using Ilonggo greetings like "Maayong aga" or "Kamusta". Keep answers concise and practical. Focus on tourist spots, food, hotels, transport, and local events in Iloilo.
 
-  /* ══ VIEW MANAGEMENT ══ */
-  function showView(id) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    if (id === 'history') loadHistory();
-    if (id === 'home') loadRecentChatsOnHome();
-    if (id === 'kbView') loadKbView();
+CRITICAL ANTI-HALLUCINATION RULES:
+1. If "Additional verified local knowledge" is provided below, you MUST use that information and it takes priority over anything else you know.
+2. NEVER contradict or ignore information provided in the Additional verified local knowledge section.
+3. If you are unsure about a specific detail, say so honestly rather than guessing.
+4. Only answer about Iloilo City and nearby areas. If asked about something outside Iloilo, politely redirect.
+5. Do NOT invent names of places, prices, dates, or contact information.`;
+
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+let currentUser   = null;
+let isGuest       = false;
+let currentSessionId = null;
+let currentChatMessages = [{ role: 'system', content: BASE_SYSTEM }];
+let lastBotReply  = null;
+let dynamicKB     = [];   // Shared KB from Firestore — ALWAYS reloaded fresh
+
+/* ══════════════════════════════════════
+   VIEW MANAGEMENT
+══════════════════════════════════════ */
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 'history') loadHistory();
+  if (id === 'home')    loadRecentChatsOnHome();
+  if (id === 'kbView')  loadKbView();
+}
+
+/* ══════════════════════════════════════
+   AUTH
+══════════════════════════════════════ */
+function openSignInModal()  { document.getElementById('signInModal').classList.add('open'); document.getElementById('signInError').style.display = 'none'; }
+function closeSignInModal() { document.getElementById('signInModal').classList.remove('open'); }
+
+async function handleGoogleSignIn() {
+  const fb = window.__fb; if (!fb) return;
+  const btn = document.getElementById('googleSignInBtn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  document.getElementById('signInError').style.display = 'none';
+  try {
+    await fb.signInWithPopup(fb.auth, fb.provider);
+    closeSignInModal();
+  } catch(e) {
+    document.getElementById('signInError').style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/></svg> Continue with Google';
   }
+}
 
-  /* ══ AUTH ══ */
-  function openSignInModal() { document.getElementById('signInModal').classList.add('open'); document.getElementById('signInError').style.display = 'none'; }
-  function closeSignInModal() { document.getElementById('signInModal').classList.remove('open'); }
+async function handleSignOut() {
+  const fb = window.__fb; if (!fb) return;
+  closeMenuDirect();
+  await fb.signOut(fb.auth);
+  currentUser = null; isGuest = false; currentSessionId = null;
+  currentChatMessages = [{ role: 'system', content: BASE_SYSTEM }];
+  showView('landing');
+  showToast('Signed out successfully.');
+}
 
-  async function handleGoogleSignIn() {
-    const fb = window.__fb; if (!fb) return;
-    const btn = document.getElementById('googleSignInBtn');
-    btn.disabled = true; btn.textContent = 'Signing in…';
-    document.getElementById('signInError').style.display = 'none';
-    try {
-      await fb.signInWithPopup(fb.auth, fb.provider);
-      closeSignInModal();
-    } catch(e) {
-      document.getElementById('signInError').style.display = 'block';
-      btn.disabled = false;
-      btn.innerHTML = '✦ Continue with Google';
+function startAsGuest() {
+  isGuest = true; currentUser = null;
+  currentSessionId = null; // FIX: Guests get NO persistent session — no chatHistory saved
+  updateUIForUser(null);
+  loadKbFromFirebase(); // Always load shared KB
+  showView('home');
+}
+
+async function onUserSignedIn(user) {
+  currentUser = user; isGuest = false;
+  updateUIForUser(user);
+  await saveUserToFirestore(user);
+  await createSession(user);
+  loadKbFromFirebase(); // Always load shared KB
+  showView('home');
+  showToast('Welcome, ' + (user.displayName || 'traveler') + '! 🌺', 'success');
+}
+
+function updateUIForUser(user) {
+  const name  = user ? (user.displayName || 'Traveler') : 'Guest';
+  const email = user ? user.email : 'Browsing as guest';
+  const photo = user ? user.photoURL : null;
+  document.getElementById('menuUserName').textContent  = name;
+  document.getElementById('menuUserEmail').textContent = email;
+  const homeAvatar = document.getElementById('homeAvatar');
+  const menuAvatar = document.getElementById('menuAvatar');
+  if (photo) {
+    homeAvatar.innerHTML = `<img src="${photo}" alt="avatar">`;
+    menuAvatar.innerHTML = `<img src="${photo}" alt="avatar">`;
+  } else {
+    homeAvatar.textContent = '👤';
+    menuAvatar.textContent = '👤';
+  }
+  document.getElementById('menuSignInItem').style.display  = user ? 'none' : 'flex';
+  document.getElementById('menuSignOutItem').style.display = user ? 'flex' : 'none';
+  document.getElementById('chatSubtitle').textContent = user
+    ? `Signed in as ${user.displayName || user.email} · Online`
+    : 'Browsing as Guest · Online';
+}
+
+/* ══════════════════════════════════════
+   FIREBASE HELPERS
+══════════════════════════════════════ */
+async function saveUserToFirestore(user) {
+  const fb = window.__fb; if (!fb || !user) return;
+  try {
+    const ref  = fb.doc(fb.db, 'users', user.uid);
+    const snap = await fb.getDoc(ref);
+    const now  = fb.serverTimestamp();
+    if (!snap.exists()) {
+      await fb.setDoc(ref, { uid: user.uid, displayName: user.displayName || '', email: user.email || '', photoURL: user.photoURL || '', isGuest: false, sessionCount: 1, createdAt: now, lastSeen: now });
+    } else {
+      await fb.updateDoc(ref, { lastSeen: now, sessionCount: (snap.data().sessionCount || 0) + 1 });
     }
-  }
+  } catch(e) { console.warn('User save error:', e); }
+}
 
-  async function handleSignOut() {
-    const fb = window.__fb; if (!fb) return;
-    closeMenuDirect();
-    await fb.signOut(fb.auth);
-    currentUser = null; isGuest = false; currentSessionId = null;
-    showView('landing');
-    showToast('Signed out successfully.');
-  }
-
-  function startAsGuest() {
-    isGuest = true; currentUser = null;
-    currentSessionId = 'guest_' + Date.now();
-    updateUIForUser(null);
-    loadKbFromFirebase(); // Background load for chips on home screen
-    showView('home');
-  }
-
-  async function onUserSignedIn(user) {
-    currentUser = user; isGuest = false;
-    updateUIForUser(user);
-    await saveUserToFirestore(user);
-    await createSession(user);
-    loadKbFromFirebase(); // Background load for chips on home screen
-    showView('home');
-    showToast('Welcome, ' + (user.displayName || 'traveler') + '! 🌺');
-  }
-
-  function updateUIForUser(user) {
-    const name  = user ? (user.displayName || 'Traveler') : 'Guest';
-    const email = user ? user.email : 'Browsing as guest';
-    const photo = user ? user.photoURL : null;
-    document.getElementById('menuUserName').textContent  = name;
-    document.getElementById('menuUserEmail').textContent = email;
-    const homeAvatar = document.getElementById('homeAvatar');
-    const menuAvatar = document.getElementById('menuAvatar');
-    if (photo) { homeAvatar.innerHTML = `<img src="${photo}" alt="avatar">`; menuAvatar.innerHTML = `<img src="${photo}" alt="avatar">`; }
-    else { homeAvatar.textContent = '👤'; menuAvatar.textContent = '👤'; }
-    document.getElementById('menuSignInItem').style.display  = user ? 'none' : 'flex';
-    document.getElementById('menuSignOutItem').style.display = user ? 'flex' : 'none';
-    document.getElementById('chatSubtitle').textContent = user ? `Signed in as ${user.displayName || user.email} · Online` : 'Browsing as Guest · Online';
-  }
-
-  /* ══ FIREBASE HELPERS ══ */
-  async function saveUserToFirestore(user) {
-    const fb = window.__fb; if (!fb || !user) return;
-    try {
-      const ref = fb.doc(fb.db, 'users', user.uid);
-      const snap = await fb.getDoc(ref);
-      const now = fb.serverTimestamp();
-      if (!snap.exists()) {
-        await fb.setDoc(ref, { uid: user.uid, displayName: user.displayName || '', email: user.email || '', photoURL: user.photoURL || '', isGuest: false, sessionCount: 1, createdAt: now, lastSeen: now });
-      } else {
-        await fb.updateDoc(ref, { lastSeen: now, sessionCount: (snap.data().sessionCount || 0) + 1 });
-      }
-    } catch(e) { console.warn('User save error:', e); }
-  }
-
-  async function createSession(user) {
-    const fb = window.__fb; if (!fb) return;
-    try {
-      const ref = await fb.addDoc(fb.collection(fb.db, 'sessions'), {
-        uid: user ? user.uid : 'guest', displayName: user ? (user.displayName || '') : 'Guest',
-        email: user ? user.email : 'guest', isGuest: !user,
-        startedAt: fb.serverTimestamp(), messageCount: 0, topic: 'General'
-      });
-      currentSessionId = ref.id;
-    } catch(e) { console.warn('Session error:', e); }
-  }
-
-  async function saveChatMessage(role, content, topic) {
-    const fb = window.__fb; if (!fb || !currentSessionId) return;
-    try {
-      await fb.addDoc(fb.collection(fb.db, 'chatHistory'), {
-        sessionId: currentSessionId, uid: currentUser ? currentUser.uid : 'guest',
-        role, content, topic: topic || 'General', timestamp: fb.serverTimestamp()
-      });
-      const sessRef = fb.doc(fb.db, 'sessions', currentSessionId);
-      const s = await fb.getDoc(sessRef);
-      await fb.updateDoc(sessRef, { messageCount: (s.data()?.messageCount || 0) + 1, topic: topic || 'General' });
-    } catch(e) { console.warn('Chat save error:', e); }
-  }
-
-  async function submitFeedback(type) {
-    const fb = window.__fb;
-    document.getElementById('fbThumbUp').classList.toggle('active-pos', type === 'positive');
-    document.getElementById('fbThumbDown').classList.toggle('active-neg', type === 'negative');
-    showToast(type === 'positive' ? 'Thanks for the feedback! 😊' : "Thanks! We'll improve.");
-    if (!fb || !currentSessionId) return;
-    try {
-      await fb.addDoc(fb.collection(fb.db, 'feedback'), { sessionId: currentSessionId, uid: currentUser ? currentUser.uid : 'guest', type, botReply: lastBotReply || '', timestamp: fb.serverTimestamp() });
-    } catch(e) { console.warn('Feedback error:', e); }
-  }
-
-  /* ══ KNOWLEDGE BASE ══ */
-
-  // FIX: Always fetches fresh data from Firestore — no caching.
-  // This ensures ANY user gets the latest shared KB on every message.
-  async function loadKbFromFirebase() {
-    const fb = window.__fb; if (!fb) return;
-    try {
-      const q = fb.query(fb.collection(fb.db, 'knowledgeBase'), fb.orderBy('timestamp', 'desc'));
-      const snap = await fb.getDocs(q);
-      dynamicKB = [];
-      snap.forEach(d => dynamicKB.push({ id: d.id, ...d.data() }));
-      refreshKbChips();
-    } catch(e) { console.warn('KB load error:', e); }
-  }
-
-  function retrieveKbContext(userQuery) {
-    if (!dynamicKB.length) return '';
-    const q = userQuery.toLowerCase();
-    const hits = dynamicKB.filter(k =>
-      q.includes(k.topic.toLowerCase()) ||
-      k.topic.toLowerCase().split(/\s+/).some(w => w.length > 3 && q.includes(w)) ||
-      k.question.toLowerCase().split(/\s+/).some(w => w.length > 4 && q.includes(w)) ||
-      k.answer.toLowerCase().split(/\s+/).some(w => w.length > 5 && q.includes(w))
-    );
-    if (!hits.length) return '';
-    return '\n\nAdditional local knowledge (use this information exactly as provided):\n' + hits.map(h => `- ${h.question}: ${h.answer}`).join('\n');
-  }
-
-  function refreshKbChips() {
-    document.querySelectorAll('.chip.custom-kb').forEach(c => c.remove());
-    const bar = document.getElementById('homeChips');
-    dynamicKB.slice(0, 4).forEach(k => {
-      const chip = document.createElement('div');
-      chip.className = 'chip custom-kb';
-      const label = k.topic.length > 14 ? k.topic.substring(0, 12) + '…' : k.topic;
-      chip.textContent = '✦ ' + label;
-      chip.title = k.question;
-      chip.onclick = () => goChat(k.question);
-      bar.appendChild(chip);
+async function createSession(user) {
+  const fb = window.__fb; if (!fb || !user) return; // FIX: Only create sessions for logged-in users
+  try {
+    const ref = await fb.addDoc(fb.collection(fb.db, 'sessions'), {
+      uid: user.uid, displayName: user.displayName || '',
+      email: user.email, isGuest: false,
+      startedAt: fb.serverTimestamp(), messageCount: 0, topic: 'General'
     });
-  }
+    currentSessionId = ref.id;
+  } catch(e) { console.warn('Session error:', e); }
+}
 
-  async function loadKbView() {
-    await loadKbFromFirebase();
-    renderKbView();
-  }
+// FIX: Only save chat messages for LOGGED-IN users. Guests get no persistent history.
+async function saveChatMessage(role, content, topic) {
+  const fb = window.__fb;
+  if (!fb || !currentUser || !currentSessionId) return; // GUEST CHECK — skip if guest
+  try {
+    await fb.addDoc(fb.collection(fb.db, 'chatHistory'), {
+      sessionId: currentSessionId, uid: currentUser.uid,
+      role, content, topic: topic || 'General', timestamp: fb.serverTimestamp()
+    });
+    const sessRef = fb.doc(fb.db, 'sessions', currentSessionId);
+    const s = await fb.getDoc(sessRef);
+    await fb.updateDoc(sessRef, { messageCount: (s.data()?.messageCount || 0) + 1, topic: topic || 'General' });
+  } catch(e) { console.warn('Chat save error:', e); }
+}
 
-  function renderKbView() {
-    const list = document.getElementById('kbViewList');
-    const catEmoji = { tourist_spots:'🏛️', food:'🍜', hotels:'🏨', transport:'🚌', events:'🎉', history:'📜', general:'🗺️' };
-    if (!dynamicKB.length) {
-      list.innerHTML = `<div class="empty-state"><div>📚</div><p>No custom entries yet.<br>Tap ＋ to add your first one!</p></div>`;
-      return;
+async function submitFeedback(type) {
+  const fb = window.__fb;
+  document.getElementById('fbThumbUp').classList.toggle('active-pos', type === 'positive');
+  document.getElementById('fbThumbDown').classList.toggle('active-neg', type === 'negative');
+  showToast(type === 'positive' ? 'Thanks for the feedback! 😊' : "Thanks! We'll improve.");
+  if (!fb) return;
+  try {
+    await fb.addDoc(fb.collection(fb.db, 'feedback'), {
+      sessionId: currentSessionId || 'guest',
+      uid: currentUser ? currentUser.uid : 'guest',
+      type, botReply: lastBotReply || '', timestamp: fb.serverTimestamp()
+    });
+  } catch(e) { console.warn('Feedback error:', e); }
+}
+
+/* ══════════════════════════════════════
+   NLP UTILITIES (for better RAG matching)
+══════════════════════════════════════ */
+
+// Tokenise to meaningful words (remove stop words)
+const STOP_WORDS = new Set(['the','a','an','is','are','was','were','what','who','where','when','how','why','i','my','in','on','at','to','for','of','and','or','but','about','tell','me','can','do','does','please','know','find','get','show','give','want','need','have','has','it','its','this','that','there','their','here','yes','no','not','best','good','great']);
+
+function tokenise(text) {
+  return text.toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 2 && !STOP_WORDS.has(w));
+}
+
+// Compute token overlap score (Jaccard-like)
+function tokenScore(queryTokens, candidateText) {
+  const candTokens = new Set(tokenise(candidateText));
+  let hits = 0;
+  for (const t of queryTokens) {
+    if (candTokens.has(t)) hits++;
+    // Partial / substring match
+    else for (const c of candTokens) {
+      if (c.includes(t) || t.includes(c)) { hits += 0.5; break; }
     }
-    list.innerHTML = dynamicKB.map(k => `
-      <div class="kb-entry">
-        <div class="kb-entry-topic">${k.topic}</div>
-        <div class="kb-entry-q">❓ ${escHtml(k.question)}</div>
-        <div class="kb-entry-a">💬 ${escHtml(k.answer.substring(0, 120))}${k.answer.length > 120 ? '…' : ''}</div>
-        <span class="kb-entry-badge">${catEmoji[k.category] || '🗺️'} ${k.category?.replace('_',' ') || 'general'}</span>
-        <button class="kb-entry-del" onclick="deleteKbEntry('${k.id}')">🗑 Delete</button>
-      </div>`).join('');
   }
+  return hits;
+}
 
-  async function deleteKbEntry(id) {
-    const fb = window.__fb; if (!fb) return;
-    try {
-      await fb.deleteDoc(fb.doc(fb.db, 'knowledgeBase', id));
-      dynamicKB = dynamicKB.filter(k => k.id !== id);
-      renderKbView();
-      refreshKbChips();
-      showToast('✅ Entry deleted', 'success');
-    } catch(e) { showToast('❌ Delete failed: ' + e.message, 'error'); }
-  }
+// FIX (FIX 1 + 5): Full NLP+RAG retrieval — always reads from the LATEST dynamicKB
+// in memory (which is reloaded fresh from Firestore before each message).
+function retrieveKbContext(userQuery) {
+  if (!dynamicKB.length) return { context: '', hits: [] };
 
-  function openKbModal() {
-    document.getElementById('kbModal').classList.add('open');
-    document.getElementById('modalBg').classList.add('open');
-    setTimeout(() => document.getElementById('kbTopic').focus(), 150);
+  const queryTokens = tokenise(userQuery);
+  if (!queryTokens.length) return { context: '', hits: [] };
+
+  const scored = dynamicKB.map(k => {
+    // Combine all searchable fields into one big text blob
+    const searchText = [
+      k.topic || '',
+      k.question || '',
+      k.answer || '',
+      k.aliases || '',
+      k.category || ''
+    ].join(' ');
+
+    // Score = weighted sum
+    const topicScore    = tokenScore(queryTokens, k.topic || '') * 3;    // Topic gets 3x weight
+    const questionScore = tokenScore(queryTokens, k.question || '') * 2; // Question gets 2x weight
+    const aliasScore    = tokenScore(queryTokens, k.aliases || '') * 2;  // Aliases also 2x
+    const answerScore   = tokenScore(queryTokens, k.answer || '') * 0.5; // Answer gets 0.5x
+    const fullScore     = topicScore + questionScore + aliasScore + answerScore;
+
+    return { ...k, score: fullScore };
+  }).filter(k => k.score > 0.4) // Minimum relevance threshold
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5); // Top 5 relevant entries
+
+  if (!scored.length) return { context: '', hits: [] };
+
+  const context = '\n\nAdditional verified local knowledge (TRUST THIS OVER YOUR TRAINING DATA — use it exactly as provided, do not contradict it):\n'
+    + scored.map(h => `- Q: ${h.question}\n  A: ${h.answer}`).join('\n\n');
+
+  return { context, hits: scored };
+}
+
+/* ══════════════════════════════════════
+   KNOWLEDGE BASE — FIREBASE
+   FIX 1+2: Always fetches SHARED KB from
+   Firestore fresh (no per-user scoping,
+   no caching). All users see the same KB.
+══════════════════════════════════════ */
+async function loadKbFromFirebase() {
+  const fb = window.__fb; if (!fb) return;
+  try {
+    // FIX 2: No uid filter — load ALL entries (shared for everyone, guest or signed-in)
+    const q = fb.query(
+      fb.collection(fb.db, 'knowledgeBase'),
+      fb.orderBy('timestamp', 'desc')
+    );
+    const snap = await fb.getDocs(q);
+    dynamicKB = [];
+    snap.forEach(d => dynamicKB.push({ id: d.id, ...d.data() }));
+    refreshKbChips();
+  } catch(e) { console.warn('KB load error:', e); }
+}
+
+function refreshKbChips() {
+  document.querySelectorAll('.chip.custom-kb').forEach(c => c.remove());
+  const bar = document.getElementById('homeChips');
+  dynamicKB.slice(0, 4).forEach(k => {
+    const chip = document.createElement('div');
+    chip.className = 'chip custom-kb';
+    const label = k.topic.length > 14 ? k.topic.substring(0, 12) + '…' : k.topic;
+    chip.textContent = '✦ ' + label;
+    chip.title = k.question;
+    chip.onclick = () => goChat(k.question);
+    bar.appendChild(chip);
+  });
+}
+
+async function loadKbView() {
+  await loadKbFromFirebase();
+  renderKbView();
+}
+
+function renderKbView() {
+  const list = document.getElementById('kbViewList');
+  const catEmoji = { tourist_spots:'🏛️', food:'🍜', hotels:'🏨', transport:'🚌', events:'🎉', history:'📜', general:'🗺️' };
+  if (!dynamicKB.length) {
+    list.innerHTML = `<div class="empty-state"><div>📚</div><p>No custom entries yet.<br>Tap ＋ to add your first one!</p></div>`;
+    return;
   }
-  function closeKbModal() {
-    document.getElementById('kbModal').classList.remove('open');
-    document.getElementById('modalBg').classList.remove('open');
-    ['kbTopic','kbQuestion','kbAnswer'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('kbCategory').value = 'tourist_spots';
-    const btn = document.getElementById('kbSaveBtn');
+  list.innerHTML = dynamicKB.map(k => `
+    <div class="kb-entry">
+      <div class="kb-entry-topic">${escHtml(k.topic)}</div>
+      <div class="kb-entry-q">❓ ${escHtml(k.question)}</div>
+      <div class="kb-entry-a">💬 ${escHtml((k.answer||'').substring(0, 120))}${(k.answer||'').length > 120 ? '…' : ''}</div>
+      ${k.aliases ? `<div class="kb-entry-a" style="margin-top:4px;font-size:10px;color:rgba(245,158,11,0.5)">🔗 ${escHtml(k.aliases)}</div>` : ''}
+      <span class="kb-entry-badge">${catEmoji[k.category] || '🗺️'} ${(k.category||'general').replace('_',' ')}</span>
+      <button class="kb-entry-del" onclick="deleteKbEntry('${k.id}')">🗑 Del</button>
+    </div>`).join('');
+}
+
+async function deleteKbEntry(id) {
+  const fb = window.__fb; if (!fb) return;
+  try {
+    await fb.deleteDoc(fb.doc(fb.db, 'knowledgeBase', id));
+    dynamicKB = dynamicKB.filter(k => k.id !== id);
+    renderKbView();
+    refreshKbChips();
+    showToast('✅ Entry deleted', 'success');
+  } catch(e) { showToast('❌ Delete failed: ' + e.message, 'error'); }
+}
+
+function openKbModal() {
+  document.getElementById('kbModal').classList.add('open');
+  document.getElementById('modalBg').classList.add('open');
+  setTimeout(() => document.getElementById('kbTopic').focus(), 200);
+}
+function closeKbModal() {
+  document.getElementById('kbModal').classList.remove('open');
+  document.getElementById('modalBg').classList.remove('open');
+  ['kbTopic','kbQuestion','kbAnswer','kbAliases'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('kbCategory').value = 'tourist_spots';
+  const btn = document.getElementById('kbSaveBtn');
+  btn.disabled = false; btn.innerHTML = '💾 Save to Firebase';
+}
+document.getElementById('modalBg').onclick = closeKbModal;
+document.getElementById('addKbBtn').onclick  = openKbModal;
+
+// FIX 2+3: KB saves are GLOBAL (no uid restriction).
+// Guests can save KB entries — they persist for ALL users.
+// KB is NOT deleted for guests. Only chat history is skipped for guests.
+async function saveKbEntry() {
+  const topic    = document.getElementById('kbTopic').value.trim();
+  const question = document.getElementById('kbQuestion').value.trim();
+  const answer   = document.getElementById('kbAnswer').value.trim();
+  const aliases  = document.getElementById('kbAliases').value.trim();
+  const category = document.getElementById('kbCategory').value;
+
+  if (!topic)    { showToast('⚠️ Please enter a topic keyword', 'error'); return; }
+  if (!question) { showToast('⚠️ Please enter a trigger question', 'error'); return; }
+  if (!answer)   { showToast('⚠️ Please enter the knowledge/answer', 'error'); return; }
+
+  const btn = document.getElementById('kbSaveBtn');
+  btn.disabled = true; btn.innerHTML = '⏳ Saving…';
+
+  const fb = window.__fb;
+  if (!fb) { showToast('❌ Firebase not ready', 'error'); btn.disabled = false; btn.innerHTML = '💾 Save to Firebase'; return; }
+
+  try {
+    // Save to Firestore with NO uid restriction — globally shared
+    const ref = await fb.addDoc(fb.collection(fb.db, 'knowledgeBase'), {
+      topic, question, answer, aliases,
+      category,
+      // Track who added it (for admin), but KB is still accessible to all
+      addedBy: currentUser ? currentUser.uid : 'guest',
+      addedByName: currentUser ? (currentUser.displayName || currentUser.email) : 'Guest',
+      isShared: true,  // Explicit shared flag
+      timestamp: fb.serverTimestamp()
+    });
+    // Update local cache immediately
+    dynamicKB.unshift({ id: ref.id, topic, question, answer, aliases, category });
+    renderKbView();
+    refreshKbChips();
+    closeKbModal();
+    showToast('✅ "' + topic + '" added! AI now knows this 🌺', 'success');
+  } catch(e) {
+    showToast('❌ Save failed: ' + e.message, 'error');
     btn.disabled = false; btn.innerHTML = '💾 Save to Firebase';
   }
-  document.getElementById('modalBg').onclick = closeKbModal;
-  document.getElementById('addKbBtn').onclick  = openKbModal;
+}
 
-  async function saveKbEntry() {
-    const topic    = document.getElementById('kbTopic').value.trim();
-    const question = document.getElementById('kbQuestion').value.trim();
-    const answer   = document.getElementById('kbAnswer').value.trim();
-    const category = document.getElementById('kbCategory').value;
+/* ══════════════════════════════════════
+   CHAT — with RAG+NLP+LLM anti-hallucination
+══════════════════════════════════════ */
+function goChat(prefill) {
+  if (prefill && typeof prefill === 'string') document.getElementById('chatInput').value = prefill;
+  showView('chat');
+  if (prefill && typeof prefill === 'string') setTimeout(() => sendMsg(), 120);
+}
 
-    if (!topic)    { showToast('⚠️ Please enter a topic keyword', 'error'); return; }
-    if (!question) { showToast('⚠️ Please enter a trigger question', 'error'); return; }
-    if (!answer)   { showToast('⚠️ Please enter the knowledge/answer', 'error'); return; }
+function appendMsg(role, text, isTyping = false) {
+  const wrap = document.createElement('div');
+  wrap.className = `msg ${role}`;
+  const avatarHtml = role === 'bot' ? `<div class="msg-avatar"></div>` : '';
+  if (isTyping) {
+    wrap.innerHTML = `${avatarHtml}<div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
+  } else {
+    wrap.innerHTML = `${avatarHtml}<div class="msg-bubble">${text}</div>`;
+  }
+  document.getElementById('chatMessages').appendChild(wrap);
+  wrap.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  return wrap;
+}
 
-    const btn = document.getElementById('kbSaveBtn');
-    btn.disabled = true; btn.innerHTML = '⏳ Saving…';
+function detectTopic(text) {
+  const t = text.toLowerCase();
+  if (t.includes('food') || t.includes('eat') || t.includes('restaurant') || t.includes('batchoy') || t.includes('cuisine') || t.includes('dish') || t.includes('menu')) return 'Food';
+  if (t.includes('hotel') || t.includes('stay') || t.includes('accommodation') || t.includes('room') || t.includes('inn')) return 'Hotels';
+  if (t.includes('spot') || t.includes('tour') || t.includes('visit') || t.includes('place') || t.includes('church') || t.includes('beach') || t.includes('attraction')) return 'Tourist Spots';
+  if (t.includes('transport') || t.includes('bus') || t.includes('jeep') || t.includes('taxi') || t.includes('ride') || t.includes('travel') || t.includes('ferry')) return 'Transport';
+  if (t.includes('event') || t.includes('festival') || t.includes('dinagyang') || t.includes('happening') || t.includes('celebration') || t.includes('fiesta')) return 'Events';
+  // Check KB topics
+  for (const k of dynamicKB) {
+    if (t.includes((k.topic || '').toLowerCase())) return (k.category || '').replace('_', ' ') || 'General';
+  }
+  return 'General';
+}
 
-    const fb = window.__fb;
-    if (!fb) { showToast('❌ Firebase not ready', 'error'); btn.disabled = false; btn.innerHTML = '💾 Save to Firebase'; return; }
+// FIX 1 (main): sendMsg ALWAYS reloads KB from Firestore before building the system prompt.
+// FIX 5: RAG context is injected into the system prompt with strong anti-hallucination instructions.
+// FIX 3: Chat history is only saved for logged-in users (saveChatMessage checks currentUser).
+async function sendMsg() {
+  const input = document.getElementById('chatInput');
+  const text  = input.value.trim();
+  if (!text) return;
+  input.value = '';
 
-    try {
-      const ref = await fb.addDoc(fb.collection(fb.db, 'knowledgeBase'), {
-        topic, question, answer, category,
-        addedBy: currentUser ? currentUser.uid : 'guest',
-        timestamp: fb.serverTimestamp()
-      });
-      dynamicKB.unshift({ id: ref.id, topic, question, answer, category });
-      renderKbView();
-      refreshKbChips();
-      closeKbModal();
-      showToast('✅ "' + topic + '" added! AI now knows this 🌺', 'success');
-    } catch(e) {
-      showToast('❌ Save failed: ' + e.message, 'error');
-      btn.disabled = false; btn.innerHTML = '💾 Save to Firebase';
+  // Create session if needed (only for logged-in users)
+  if (!currentSessionId && currentUser) await createSession(currentUser);
+
+  // ── FIX 1: ALWAYS reload shared KB fresh from Firestore before every message ──
+  await loadKbFromFirebase();
+
+  const topic = detectTopic(text);
+  appendMsg('user', text);
+
+  // ── FIX 5: NLP+RAG — find relevant KB entries ──
+  const { context: kbCtx, hits } = retrieveKbContext(text);
+
+  // Build system prompt with KB context injected
+  const systemWithKb = BASE_SYSTEM + kbCtx;
+
+  // Build messages array for API
+  const msgsToSend = [
+    { role: 'system', content: systemWithKb },
+    ...currentChatMessages.slice(1), // Conversation history (no system)
+    { role: 'user', content: text }
+  ];
+  currentChatMessages.push({ role: 'user', content: text });
+
+  // FIX 3: Only save for logged-in users
+  await saveChatMessage('user', text, topic);
+
+  const typingEl = appendMsg('bot', '', true);
+  document.getElementById('feedbackBar').style.display = 'none';
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: msgsToSend })
+    });
+    if (!res.ok) throw new Error('API ' + res.status);
+    const data = await res.json();
+    const reply = data.choices?.[0]?.message?.content?.trim()
+      || 'Sorry, I could not get a response. Please try again.';
+
+    currentChatMessages.push({ role: 'assistant', content: reply });
+    lastBotReply = reply;
+
+    // Show RAG badge if KB entries were used
+    let replyHtml = reply;
+    if (hits.length > 0) {
+      replyHtml += `<div><span class="rag-badge">✓ Verified local data</span></div>`;
+    }
+    typingEl.querySelector('.msg-bubble').innerHTML = replyHtml;
+
+    // FIX 3: Only save chat history for logged-in users
+    await saveChatMessage('assistant', reply, topic);
+
+    document.getElementById('feedbackBar').style.display = 'flex';
+    document.getElementById('fbThumbUp').classList.remove('active-pos');
+    document.getElementById('fbThumbDown').classList.remove('active-neg');
+  } catch(e) {
+    typingEl.querySelector('.msg-bubble').textContent = '⚠️ ' + e.message + '. Please check your connection.';
+  }
+  typingEl.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+/* ══════════════════════════════════════
+   HISTORY (only for logged-in users)
+══════════════════════════════════════ */
+async function loadHistory() {
+  const fb = window.__fb;
+  const container = document.getElementById('historyList');
+  if (!fb || !currentUser) {
+    // FIX 3: Guests see explanation instead of history
+    container.innerHTML = `<div class="empty-state"><div>🔑</div><p>Sign in to save and view your chat history.<br><br>Guest conversations are not saved.</p></div>`;
+    return;
+  }
+  container.innerHTML = `<div class="empty-state"><p>Loading...</p></div>`;
+  try {
+    const q = fb.query(
+      fb.collection(fb.db, 'chatHistory'),
+      fb.where('uid','==',currentUser.uid),
+      fb.limit(100)
+    );
+    const snap = await fb.getDocs(q);
+    if (snap.empty) {
+      container.innerHTML = `<div class="empty-state"><div>💬</div><p>No chat history yet.<br>Start a conversation!</p></div>`;
+      return;
+    }
+    const items = snap.docs.map(d => d.data())
+      .sort((a,b) => (b.timestamp?.toMillis?.() || 0) - (a.timestamp?.toMillis?.() || 0))
+      .slice(0, 50);
+    container.innerHTML = items.filter(i => i.role === 'user').map(i => {
+      const time = i.timestamp?.toDate?.().toLocaleString('en-PH', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) || '';
+      const safe = escHtml(i.content || '');
+      const escaped = (i.content || '').replace(/'/g, "\\'");
+      return `<div class="history-item" onclick="goChat('${escaped}')">
+        <div class="hist-icon">${getTopicIcon(i.topic)}</div>
+        <div class="hist-info">
+          <div class="hist-title">${safe.substring(0,50)}${safe.length>50?'...':''}</div>
+          <div class="hist-preview">${i.topic || 'General'}</div>
+        </div>
+        <div class="hist-time">${time}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = `<div class="empty-state"><p>Could not load history.<br>${e.message}</p></div>`;
+  }
+}
+
+async function loadRecentChatsOnHome() {
+  const fb = window.__fb;
+  const container = document.getElementById('homeRecentChats');
+  if (!fb || !currentUser) {
+    container.innerHTML = `<div style="font-size:12px;color:var(--muted);text-align:center;padding:10px">Sign in to see your recent chats.</div>`;
+    return;
+  }
+  try {
+    const q = fb.query(
+      fb.collection(fb.db, 'chatHistory'),
+      fb.where('uid','==',currentUser.uid),
+      fb.where('role','==','user'),
+      fb.limit(20)
+    );
+    const snap = await fb.getDocs(q);
+    if (snap.empty) {
+      container.innerHTML = `<div style="font-size:12px;color:var(--muted);text-align:center;padding:10px">No recent chats yet.</div>`;
+      return;
+    }
+    const recent = snap.docs.map(d => d.data())
+      .sort((a,b) => (b.timestamp?.toMillis?.() || 0) - (a.timestamp?.toMillis?.() || 0))
+      .slice(0, 3);
+    container.innerHTML = recent.map(i => {
+      const time = i.timestamp?.toDate?.().toLocaleString('en-PH', { hour:'2-digit', minute:'2-digit' }) || '';
+      const safe = escHtml(i.content || '');
+      const escaped = (i.content || '').replace(/'/g, "\\'");
+      return `<div class="history-item" onclick="goChat('${escaped}')">
+        <div class="hist-icon">${getTopicIcon(i.topic)}</div>
+        <div class="hist-info">
+          <div class="hist-title">${safe.substring(0,40)}${safe.length>40?'...':''}</div>
+          <div class="hist-preview">${i.topic || 'General'}</div>
+        </div>
+        <div class="hist-time">${time}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '';
+  }
+}
+
+function getTopicIcon(topic) {
+  const map = { Food:'🍜', Hotels:'🏨', 'Tourist Spots':'🏛️', Transport:'🚌', Events:'🎉', General:'💬' };
+  return map[topic] || '💬';
+}
+
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ══════════════════════════════════════
+   MENU
+══════════════════════════════════════ */
+function openMenu()       { document.getElementById('menuOverlay').classList.add('open'); }
+function closeMenuDirect(){ document.getElementById('menuOverlay').classList.remove('open'); }
+function closeMenu(e)     { if (e.target === document.getElementById('menuOverlay')) closeMenuDirect(); }
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.className = 'toast'; }, 3200);
+}
+
+/* ══════════════════════════════════════
+   AUTH LISTENER
+══════════════════════════════════════ */
+window.__onAuthReady = function(user) {
+  if (user) {
+    onUserSignedIn(user);
+  } else {
+    if (currentUser) { currentUser = null; showView('landing'); }
+    const btn = document.getElementById('googleSignInBtn');
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="rgba(255,255,255,0.8)" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="rgba(255,255,255,0.6)" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="rgba(255,255,255,0.4)" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Continue with Google';
     }
   }
-
-  /* ══ CHAT ══ */
-  function goChat(prefill) {
-    if (prefill && typeof prefill === 'string') document.getElementById('chatInput').value = prefill;
-    showView('chat');
-    if (prefill && typeof prefill === 'string') setTimeout(() => sendMsg(), 100);
-  }
-
-  function appendMsg(role, text, isTyping = false) {
-    const wrap = document.createElement('div');
-    wrap.className = `msg ${role}`;
-    const avatarHtml = role === 'bot' ? `<div class="msg-avatar"></div>` : '';
-    if (isTyping) {
-      wrap.innerHTML = `${avatarHtml}<div class="msg-bubble"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
-    } else {
-      wrap.innerHTML = `${avatarHtml}<div class="msg-bubble">${text}</div>`;
-    }
-    document.getElementById('chatMessages').appendChild(wrap);
-    wrap.scrollIntoView({ behavior: 'smooth' });
-    return wrap;
-  }
-
-  function detectTopic(text) {
-    const t = text.toLowerCase();
-    if (t.includes('food') || t.includes('eat') || t.includes('restaurant') || t.includes('batchoy') || t.includes('cuisine')) return 'Food';
-    if (t.includes('hotel') || t.includes('stay') || t.includes('accommodation')) return 'Hotels';
-    if (t.includes('spot') || t.includes('tour') || t.includes('visit') || t.includes('place') || t.includes('church')) return 'Tourist Spots';
-    if (t.includes('transport') || t.includes('bus') || t.includes('jeep') || t.includes('taxi') || t.includes('ride')) return 'Transport';
-    if (t.includes('event') || t.includes('festival') || t.includes('dinagyang') || t.includes('happening')) return 'Events';
-    for (const k of dynamicKB) {
-      if (t.includes(k.topic.toLowerCase())) return k.category?.replace('_',' ') || 'General';
-    }
-    return 'General';
-  }
-
-  // FIX: sendMsg now always fetches the latest KB from Firestore BEFORE
-  // building the system prompt. This means every user, on every message,
-  // gets the full shared knowledge base — no stale in-memory cache issues.
-  async function sendMsg() {
-    const input = document.getElementById('chatInput');
-    const text = input.value.trim();
-    if (!text) return;
-    input.value = '';
-
-    if (!currentSessionId) await createSession(null);
-
-    // ── KEY FIX: Always reload KB fresh from Firestore before each message ──
-    await loadKbFromFirebase();
-
-    const topic = detectTopic(text);
-    appendMsg('user', text);
-
-    const kbCtx = retrieveKbContext(text);
-    const systemWithKb = BASE_SYSTEM + kbCtx;
-
-    const msgsToSend = [
-      { role: 'system', content: systemWithKb },
-      ...currentChatMessages.slice(1),
-      { role: 'user', content: text }
-    ];
-    currentChatMessages.push({ role: 'user', content: text });
-
-    await saveChatMessage('user', text, topic);
-    const typingEl = appendMsg('bot', '', true);
-    document.getElementById('feedbackBar').style.display = 'none';
-
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: msgsToSend })
-      });
-      if (!res.ok) throw new Error('API ' + res.status);
-      const data = await res.json();
-      const reply = data.choices?.[0]?.message?.content?.trim() || 'Sorry, I could not get a response. Please try again.';
-      currentChatMessages.push({ role: 'assistant', content: reply });
-      lastBotReply = reply;
-      typingEl.querySelector('.msg-bubble').innerHTML = reply;
-      await saveChatMessage('assistant', reply, topic);
-      document.getElementById('feedbackBar').style.display = 'flex';
-      document.getElementById('fbThumbUp').classList.remove('active-pos');
-      document.getElementById('fbThumbDown').classList.remove('active-neg');
-    } catch(e) {
-      typingEl.querySelector('.msg-bubble').innerHTML = '⚠️ ' + e.message + '. Please check your connection.';
-    }
-    typingEl.scrollIntoView({ behavior: 'smooth' });
-  }
-
-  /* ══ HISTORY ══ */
-  async function loadHistory() {
-    const fb = window.__fb;
-    const container = document.getElementById('historyList');
-    if (!fb || (!currentUser && !currentSessionId)) {
-      container.innerHTML = `<div class="empty-state"><div>💬</div><p>Sign in to view your chat history.</p></div>`; return;
-    }
-    container.innerHTML = `<div class="empty-state"><p>Loading...</p></div>`;
-    try {
-      const uid = currentUser ? currentUser.uid : 'guest';
-      const q = fb.query(fb.collection(fb.db, 'chatHistory'), fb.where('uid','==',uid), fb.limit(100));
-      const snap = await fb.getDocs(q);
-      if (snap.empty) { container.innerHTML = `<div class="empty-state"><div>💬</div><p>No chat history yet.<br>Start a conversation!</p></div>`; return; }
-      const items = snap.docs.map(d => d.data()).sort((a,b) => (b.timestamp?.toMillis?.() || 0) - (a.timestamp?.toMillis?.() || 0)).slice(0,50);
-      container.innerHTML = items.filter(i => i.role === 'user').map(i => {
-        const time = i.timestamp?.toDate?.().toLocaleString('en-PH', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) || '';
-        return `<div class="history-item" onclick="goChat('${i.content.replace(/'/g,"\\'")}')">
-          <div class="hist-icon">${getTopicIcon(i.topic)}</div>
-          <div class="hist-info"><div class="hist-title">${escHtml(i.content.substring(0,50))}${i.content.length>50?'...':''}</div><div class="hist-preview">${i.topic||'General'}</div></div>
-          <div class="hist-time">${time}</div></div>`;
-      }).join('');
-    } catch(e) { container.innerHTML = `<div class="empty-state"><p>Could not load history.<br>${e.message}</p></div>`; }
-  }
-
-  async function loadRecentChatsOnHome() {
-    const fb = window.__fb;
-    const container = document.getElementById('homeRecentChats');
-    if (!fb || !currentUser) { container.innerHTML = `<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px">Sign in to see your recent chats.</div>`; return; }
-    try {
-      const q = fb.query(fb.collection(fb.db, 'chatHistory'), fb.where('uid','==',currentUser.uid), fb.where('role','==','user'), fb.limit(20));
-      const snap = await fb.getDocs(q);
-      if (snap.empty) { container.innerHTML = `<div style="font-size:12px;color:var(--muted);text-align:center;padding:12px">No recent chats yet.</div>`; return; }
-      const recent = snap.docs.map(d => d.data()).sort((a,b) => (b.timestamp?.toMillis?.() || 0) - (a.timestamp?.toMillis?.() || 0)).slice(0,3);
-      container.innerHTML = recent.map(i => {
-        const time = i.timestamp?.toDate?.().toLocaleString('en-PH', { hour:'2-digit', minute:'2-digit' }) || '';
-        return `<div class="history-item" onclick="goChat('${i.content.replace(/'/g,"\\'")}')">
-          <div class="hist-icon">${getTopicIcon(i.topic)}</div>
-          <div class="hist-info"><div class="hist-title">${escHtml(i.content.substring(0,40))}${i.content.length>40?'...':''}</div><div class="hist-preview">${i.topic||'General'}</div></div>
-          <div class="hist-time">${time}</div></div>`;
-      }).join('');
-    } catch(e) { container.innerHTML = ''; }
-  }
-
-  function getTopicIcon(topic) {
-    const map = { Food:'🍜', Hotels:'🏨', 'Tourist Spots':'🏛️', Transport:'🚌', Events:'🎉', General:'💬' };
-    return map[topic] || '💬';
-  }
-  function escHtml(str) {
-    return (str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  /* ══ MENU ══ */
-  function openMenu() { document.getElementById('menuOverlay').classList.add('open'); }
-  function closeMenuDirect() { document.getElementById('menuOverlay').classList.remove('open'); }
-  function closeMenu(e) { if (e.target === document.getElementById('menuOverlay')) closeMenuDirect(); }
-
-  /* ══ TOAST ══ */
-  function showToast(msg, type = '') {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.className = 'toast show' + (type ? ' ' + type : '');
-    setTimeout(() => t.className = 'toast', 3200);
-  }
-
-  /* ══ AUTH LISTENER ══ */
-  window.__onAuthReady = function(user) {
-    if (user) {
-      onUserSignedIn(user);
-    } else {
-      if (currentUser) { currentUser = null; showView('landing'); }
-      const btn = document.getElementById('googleSignInBtn');
-      if (btn) { btn.disabled = false; btn.innerHTML = '✦ Continue with Google'; }
-    }
-  };
-  if (window.__fbUser) onUserSignedIn(window.__fbUser);
+};
+if (window.__fbUser) onUserSignedIn(window.__fbUser);
 </script>
 </body>
 </html>
